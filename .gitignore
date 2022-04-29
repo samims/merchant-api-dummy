@@ -1,0 +1,14 @@
+docker/.env
+# Binaries for programs and plugins
+*.exe
+modd
+
+# Test binary, built with `go test -c`
+*.test
+
+# Vim swap file
+*.swp
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+/merchant-api

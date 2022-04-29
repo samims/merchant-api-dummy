@@ -1,0 +1,30 @@
+version: "3"
+services:
+    merchant-api:
+        networks:
+            - merchant-net
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: merchant-api
+        env_file: .env
+        ports:
+            - "3001:3000"
+        volumes:
+            - "../:/code"
+
+    merchant_db:
+        networks:
+            - merchant-net  
+        image: postgres:12
+        container_name: merchant_db
+        ports:
+            - "5435:5432"
+        env_file: .env
+        volumes:
+            - merchant-db-data:/var/lib/postgresql/data/
+
+volumes:
+    merchant-db-data:
+networks:
+    merchant-net:
