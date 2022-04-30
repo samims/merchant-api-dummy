@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -19,7 +20,8 @@ func main() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		usedPort := config.ApiConfig().Port()
 		logger.Log.Info("Used port " + usedPort)
-		w.Write([]byte("Welcome"))
+		w.Write([]byte("Welcome\n"))
+		w.Write([]byte(fmt.Sprintf("AppCofig buld_env value is: %s", config.AppConfig().GetBuildEnv())))
 	})
 	logger.Log.Info("Server listening on port 3000")
 
