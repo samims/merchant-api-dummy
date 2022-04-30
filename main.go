@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/samims/merchant-api/api/rest/router"
+	"github.com/samims/merchant-api/app"
 	"github.com/samims/merchant-api/config"
 	"github.com/samims/merchant-api/logger"
 	"github.com/spf13/viper"
@@ -12,11 +13,13 @@ import (
 
 func main() {
 	v := viper.New()
-	config := config.Init(v)
+	cfg := config.Init(v)
 
-	r := router.Init(config)
+	svc := app.InitServices(cfg)
 
-	port := config.ApiConfig().Port()
+	r := router.Init(cfg, svc)
+
+	port := cfg.ApiConfig().Port()
 	logger.Log.Infof("Server listening on port %s...", port)
 
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
