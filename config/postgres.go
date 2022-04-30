@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 
+	"github.com/astaxie/beego/orm"
+	_ "github.com/lib/pq"
 	"github.com/samims/merchant-api/logger"
 	"github.com/spf13/viper"
 )
@@ -14,6 +16,7 @@ type PostgresConfig interface {
 	User() string
 	Password() string
 	ConnectionURL() string
+	GetDB() orm.Ormer
 }
 
 type postgresConfig struct {
@@ -32,7 +35,7 @@ func (cfg *postgresConfig) Port() string {
 
 func (cfg *postgresConfig) Database() string {
 	cfg.env.AutomaticEnv()
-	return cfg.env.GetString("postgres_database")
+	return cfg.env.GetString("postgres_db")
 }
 
 //
@@ -48,12 +51,31 @@ func (cfg *postgresConfig) Password() string {
 }
 
 // ConnectionURL returns connection url for postgresql database
-func (config *postgresConfig) ConnectionURL() string {
-	url := config.env.GetString("postgres_url")
-	if len(url) > 0 {
-		return url
+func (cfg *postgresConfig) ConnectionURL() string {
+	connectionUrl := fmt.Sprintf(`postgres://%v:%v@%v:%v/%v?sslmode=disable`, cfg.User(), cfg.Password(), cfg.Host(), cfg.Port(), cfg.Database())
+	logger.Log.Info(connectionUrl)
+	return connectionUrl
+}
+
+//"postgres://merchant_db_user:merchant_db_password@localhost:5435/?sslmode=disable
+
+func (cfg *postgresConfig) GetDB() orm.Ormer {
+	logger.Log.Info("Connecting to Database.....")
+	err := orm.RegisterDriver("postgres", orm.DRPostgres)
+	if err != nil {
+		logger.Log.Fatal(err)
 	}
-	return fmt.Sprintf(`postgres://%v:%v@%v:%v/%v?sslmode=disable`, config.User(), config.Password(), config.Host(), config.Port(), config.Database())
+	err = orm.RegisterDataBase("default", "postgres", cfg.ConnectionURL())
+	if err != nil {
+		logger.Log.Fatal(err)
+	}
+	db := orm.NewOrm()
+	db.Using("default")
+	// auto migration turned on
+	orm.RunSyncdb("default", true, true)
+	logger.Log.Info("Database connected successfully!!!!")
+	return db
+
 }
 
 func NewPostgresConfig(env *viper.Viper) PostgresConfig {

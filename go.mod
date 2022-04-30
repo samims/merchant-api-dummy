@@ -9,6 +9,13 @@ require (
 )
 
 require (
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/lib/pq v1.10.5 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+)
+
+require (
+	github.com/astaxie/beego v1.12.3
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect

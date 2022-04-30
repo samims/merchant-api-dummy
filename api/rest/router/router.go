@@ -14,8 +14,11 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 	router.Use(middleware.Logger)
 
 	pingController := controllers.NewPing(cfg, svc)
+	userController := controllers.NewUser(cfg, svc)
 
-	router.Get("/", pingController.Get)
+	router.Get("/ping", pingController.Get)
+	router.Post("/signup", userController.SignUp)
+
 	return router
 
 }

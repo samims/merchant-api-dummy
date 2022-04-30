@@ -1,16 +1,16 @@
 package services
 
-type Ping interface {
+type PingService interface {
 	Get() string
 }
 
-type ping struct {
+type pingService struct {
 }
 
-func (p *ping) Get() string {
+func (p *pingService) Get() string {
 	return "Pong!!!!!!"
 }
 
-func NewPing() Ping {
-	return &ping{}
+func NewPingService() PingService {
+	return &pingService{}
 }

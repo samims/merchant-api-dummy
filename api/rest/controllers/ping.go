@@ -19,7 +19,7 @@ type ping struct {
 }
 
 func (p *ping) Get(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(p.svc.PingServices().Get()))
+	w.Write([]byte(p.svc.PingService().Get()))
 }
 
 func NewPing(cfg config.Configuration, svc app.Services) Ping {
