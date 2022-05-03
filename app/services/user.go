@@ -10,6 +10,7 @@ import (
 
 type UserService interface {
 	SignUp(context.Context, models.User) (models.User, error)
+	GetAll(context.Context) ([]models.User, error)
 }
 
 type userService struct {
@@ -21,6 +22,17 @@ func (svc *userService) SignUp(ctx context.Context, user models.User) (models.Us
 
 	svc.userRepo.Save(ctx, &user)
 	return user, nil
+}
+
+func (svc *userService) GetAll(ctx context.Context) ([]models.User, error) {
+	logger.Log.Info("User GetAll service is being called!!")
+	users, err := svc.userRepo.GetAll(ctx)
+	if err != nil {
+		logger.Log.WithError(err).Error("GetAll_userService")
+		return nil, err
+	}
+	return users, nil
+
 }
 
 func NewUserService(userRepo repository.UserRepo) UserService {

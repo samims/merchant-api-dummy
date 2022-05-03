@@ -14,6 +14,7 @@ import (
 
 type User interface {
 	SignUp(http.ResponseWriter, *http.Request)
+	GetAll(http.ResponseWriter, *http.Request)
 }
 
 type user struct {
@@ -50,6 +51,27 @@ func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(userBytes)
 
+}
+
+func (ctlr *user) GetAll(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	// body, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	logger.Log.Error(err)
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	return
+	// }
+	svc_resp, err := ctlr.svc.UserService().GetAll(ctx)
+
+	if err != nil {
+		logger.Log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	logger.Log.Info(svc_resp)
+	userBytes, _ := json.Marshal(svc_resp)
+
+	w.Write(userBytes)
 }
 
 func NewUser(cfg config.Configuration, svc app.Services) User {

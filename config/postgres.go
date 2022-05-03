@@ -53,11 +53,8 @@ func (cfg *postgresConfig) Password() string {
 // ConnectionURL returns connection url for postgresql database
 func (cfg *postgresConfig) ConnectionURL() string {
 	connectionUrl := fmt.Sprintf(`postgres://%v:%v@%v:%v/%v?sslmode=disable`, cfg.User(), cfg.Password(), cfg.Host(), cfg.Port(), cfg.Database())
-	logger.Log.Info(connectionUrl)
 	return connectionUrl
 }
-
-//"postgres://merchant_db_user:merchant_db_password@localhost:5435/?sslmode=disable
 
 func (cfg *postgresConfig) GetDB() orm.Ormer {
 	logger.Log.Info("Connecting to Database.....")

@@ -11,7 +11,7 @@ type User struct {
 }
 
 // TableName returns table name which will be created on db
-func (*User) TableName() string {
+func (u *User) TableName() string {
 	return "users"
 }
 

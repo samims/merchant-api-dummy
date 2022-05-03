@@ -18,6 +18,7 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 
 	router.Get("/ping", pingController.Get)
 	router.Post("/signup", userController.SignUp)
+	router.Get("/users", userController.GetAll)
 
 	return router
 

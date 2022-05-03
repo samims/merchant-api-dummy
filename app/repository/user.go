@@ -10,6 +10,7 @@ import (
 
 type UserRepo interface {
 	Save(context.Context, *models.User) error
+	GetAll(context.Context) ([]models.User, error)
 }
 
 type userRepo struct {
@@ -30,6 +31,20 @@ func (repo *userRepo) Save(ctx context.Context, doc *models.User) error {
 	doc.Id = id
 
 	return nil
+}
+
+// get user list
+func (repo *userRepo) GetAll(ctx context.Context) ([]models.User, error) {
+	var users []models.User
+	groupError := "GetUserList_userRepo"
+	_, err := repo.db.QueryTable("users").All(&users)
+
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func NewUserRepo(db orm.Ormer) UserRepo {
