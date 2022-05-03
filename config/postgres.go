@@ -17,6 +17,7 @@ type PostgresConfig interface {
 	Password() string
 	ConnectionURL() string
 	GetDB() orm.Ormer
+	AutoMigrate() bool
 }
 
 type postgresConfig struct {
@@ -56,6 +57,17 @@ func (cfg *postgresConfig) ConnectionURL() string {
 	return connectionUrl
 }
 
+func (cfg *postgresConfig) AutoMigrate() bool {
+	cfg.env.AutomaticEnv()
+	runAutoMigrate := cfg.env.GetBool("auto_migrate")
+	if runAutoMigrate {
+		orm.RunSyncdb("default", true, true)
+		return true
+	}
+	return false
+
+}
+
 func (cfg *postgresConfig) GetDB() orm.Ormer {
 	logger.Log.Info("Connecting to Database.....")
 	err := orm.RegisterDriver("postgres", orm.DRPostgres)
@@ -69,7 +81,9 @@ func (cfg *postgresConfig) GetDB() orm.Ormer {
 	db := orm.NewOrm()
 	db.Using("default")
 	// auto migration turned on
-	orm.RunSyncdb("default", true, true)
+
+	// orm.RunSyncdb("default", true, true)
+	cfg.AutoMigrate()
 	logger.Log.Info("Database connected successfully!!!!")
 	return db
 
