@@ -37,7 +37,9 @@ func (repo *userRepo) Save(ctx context.Context, doc *models.User) error {
 func (repo *userRepo) GetAll(ctx context.Context) ([]models.User, error) {
 	var users []models.User
 	groupError := "GetUserList_userRepo"
-	_, err := repo.db.QueryTable("users").All(&users)
+	qs := repo.db.QueryTable(new(models.User))
+	qs = qs.RelatedSel()
+	_, err := qs.All(&users)
 
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)

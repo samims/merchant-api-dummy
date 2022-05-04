@@ -16,27 +16,17 @@ type ErrorResponse struct {
 
 // Renderer is a function that handles the success response
 func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
+	logger.Log.Info(errList)
 	groupError := "Renderer"
-	// success response handling
-	if len(errList) == 0 {
-		w.Header().Add("Content-Type", "application/json")
-
-		jsonResp, err := json.Marshal(data)
-		if err != nil {
-			logger.Log.WithError(err).Error(groupError)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Write(jsonResp)
-		return
-	}
-
 	// error handling for the response
+
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
 	erroResp := []ErrorResponse{}
 	for _, err := range errList {
+
+		if err == nil {
+			continue
+		}
 		errMsg := constants.ErrorString[err.Error()]
 		if len(errMsg) == 0 {
 			errMsg = err.Error()
@@ -49,6 +39,21 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 		erroResp = append(erroResp, resp)
 
 	}
+	if len(erroResp) == 0 {
+		w.Header().Add("Content-Type", "application/json")
+
+		jsonResp, err := json.Marshal(data)
+		if err != nil {
+			logger.Log.WithError(err).Error(groupError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Write(jsonResp)
+		return
+	}
+	w.WriteHeader(http.StatusBadRequest)
+
 	jsonResp, err := json.Marshal(erroResp)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
