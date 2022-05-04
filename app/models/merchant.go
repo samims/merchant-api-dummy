@@ -2,6 +2,7 @@ package models
 
 import "github.com/astaxie/beego/orm"
 
+// Merchant represents a merchant
 type Merchant struct {
 	BaseModel
 	Name string  `json:"name" orm:"column(name)"`

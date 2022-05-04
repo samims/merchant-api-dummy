@@ -2,6 +2,7 @@ package models
 
 import "github.com/astaxie/beego/orm"
 
+// User represents a user of the system assigned to a merchant
 type User struct {
 	BaseModel
 	Email        string    `json:"email" orm:"column(email); unique"`
