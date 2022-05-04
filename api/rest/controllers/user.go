@@ -10,6 +10,7 @@ import (
 	"github.com/samims/merchant-api/app/models"
 	"github.com/samims/merchant-api/config"
 	"github.com/samims/merchant-api/logger"
+	"github.com/samims/merchant-api/utils"
 )
 
 type User interface {
@@ -22,6 +23,7 @@ type user struct {
 	svc app.Services
 }
 
+// SignUp is a controller that creates a new user by calling the service
 func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	body, err := ioutil.ReadAll(r.Body)
@@ -39,28 +41,14 @@ func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	svc_resp, err := ctlr.svc.UserService().SignUp(ctx, user)
+	resp, err := ctlr.svc.UserService().SignUp(ctx, user)
 
-	if err != nil {
-		logger.Log.Error(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	logger.Log.Info(svc_resp)
-	userBytes, _ := json.Marshal(svc_resp)
-
-	w.Write(userBytes)
+	utils.Renderer(w, resp, err)
 
 }
 
 func (ctlr *user) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	// body, err := ioutil.ReadAll(r.Body)
-	// if err != nil {
-	// 	logger.Log.Error(err)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
 	svc_resp, err := ctlr.svc.UserService().GetAll(ctx)
 
 	if err != nil {

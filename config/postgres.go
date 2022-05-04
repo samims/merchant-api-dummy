@@ -60,12 +60,7 @@ func (cfg *postgresConfig) ConnectionURL() string {
 func (cfg *postgresConfig) AutoMigrate() bool {
 	cfg.env.AutomaticEnv()
 	runAutoMigrate := cfg.env.GetBool("auto_migrate")
-	if runAutoMigrate {
-		orm.RunSyncdb("default", true, true)
-		return true
-	}
-	return false
-
+	return runAutoMigrate
 }
 
 func (cfg *postgresConfig) GetDB() orm.Ormer {
@@ -80,10 +75,11 @@ func (cfg *postgresConfig) GetDB() orm.Ormer {
 	}
 	db := orm.NewOrm()
 	db.Using("default")
-	// auto migration turned on
 
-	// orm.RunSyncdb("default", true, true)
-	cfg.AutoMigrate()
+	autoMigrate := cfg.AutoMigrate()
+
+	orm.RunSyncdb("default", autoMigrate, true)
+
 	logger.Log.Info("Database connected successfully!!!!")
 	return db
 

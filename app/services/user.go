@@ -17,13 +17,13 @@ type userService struct {
 	userRepo repository.UserRepo
 }
 
+// SignUp is a service that creates a new user
 func (svc *userService) SignUp(ctx context.Context, user models.User) (models.User, error) {
-	logger.Log.Info("Signup service is being called!!!!")
-
-	svc.userRepo.Save(ctx, &user)
-	return user, nil
+	err := svc.userRepo.Save(ctx, &user)
+	return user, err
 }
 
+// GetAll is a service that returns all users
 func (svc *userService) GetAll(ctx context.Context) ([]models.User, error) {
 	logger.Log.Info("User GetAll service is being called!!")
 	users, err := svc.userRepo.GetAll(ctx)
