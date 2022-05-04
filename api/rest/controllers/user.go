@@ -41,6 +41,14 @@ func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	errorList := utils.Validate(user)
+	if len(errorList) > 0 {
+		logger.Log.Error(errorList)
+		utils.Renderer(w, user, errorList...)
+		return
+	}
+
 	resp, err := ctlr.svc.UserService().SignUp(ctx, user)
 
 	utils.Renderer(w, resp, err)
@@ -56,9 +64,7 @@ func (ctlr *user) GetAll(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	logger.Log.Info(svc_resp)
 	userBytes, _ := json.Marshal(svc_resp)
-
 	w.Write(userBytes)
 }
 

@@ -2,15 +2,17 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/samims/merchant-api/app/models"
 	"github.com/samims/merchant-api/app/repository"
+	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/logger"
 )
 
 type UserService interface {
-	SignUp(context.Context, models.User) (models.User, error)
-	GetAll(context.Context) ([]models.User, error)
+	SignUp(context.Context, models.User) (models.PublicUser, error)
+	GetAll(context.Context) ([]models.PublicUser, error)
 }
 
 type userService struct {
@@ -18,20 +20,32 @@ type userService struct {
 }
 
 // SignUp is a service that creates a new user
-func (svc *userService) SignUp(ctx context.Context, user models.User) (models.User, error) {
+func (svc *userService) SignUp(ctx context.Context, user models.User) (models.PublicUser, error) {
+	groupError := "SignUp_userService"
+
+	if user.GeneratePasswordHash() != nil {
+		logger.Log.WithError(user.GeneratePasswordHash()).Error(groupError)
+		return user.Serialize(), errors.New(constants.InternalServerError)
+	}
+
 	err := svc.userRepo.Save(ctx, &user)
-	return user, err
+	// to remove password hash from response
+	publicUser := user.Serialize()
+	return publicUser, err
 }
 
 // GetAll is a service that returns all users
-func (svc *userService) GetAll(ctx context.Context) ([]models.User, error) {
-	logger.Log.Info("User GetAll service is being called!!")
+func (svc *userService) GetAll(ctx context.Context) ([]models.PublicUser, error) {
 	users, err := svc.userRepo.GetAll(ctx)
 	if err != nil {
 		logger.Log.WithError(err).Error("GetAll_userService")
 		return nil, err
 	}
-	return users, nil
+	publicUsers := make([]models.PublicUser, len(users))
+	for i, user := range users {
+		publicUsers[i] = user.Serialize()
+	}
+	return publicUsers, nil
 
 }
 
