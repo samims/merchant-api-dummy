@@ -36,13 +36,20 @@ func init() {
 }
 
 type PublicMerchant struct {
-	Merchant
-	Teams []*PublicUser `json:"teams"`
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+	URL  string `json:"url"`
+	Code string `json:"code"`
+
+	Team []*PublicUser `json:"team"`
 }
 
-func (m *Merchant) Serialize(teams []*PublicUser) PublicMerchant {
+func (m *Merchant) Serialize(team []*PublicUser) PublicMerchant {
 	return PublicMerchant{
-		Merchant: *m,
-		Teams:    teams,
+		Id:   m.Id,
+		Name: m.Name,
+		URL:  m.URL,
+		Code: m.Code,
+		Team: team,
 	}
 }

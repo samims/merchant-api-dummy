@@ -10,6 +10,7 @@ import (
 
 type MerchantService interface {
 	Create(context.Context, models.Merchant) (models.PublicMerchant, error)
+	Get(context.Context, int64) (models.PublicMerchant, error)
 }
 
 type merchantService struct {
@@ -57,6 +58,40 @@ func (svc *merchantService) Create(ctx context.Context, merchant models.Merchant
 	}
 
 	return merchant.Serialize(relatedUserPublic), err
+}
+
+func (svc *merchantService) Get(ctx context.Context, id int64) (models.PublicMerchant, error) {
+	groupError := "Get_merchantService"
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{Id: id},
+	}
+	resp, err := svc.merchantRepo.FindOne(ctx, merchant)
+
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return models.PublicMerchant{}, err
+	}
+
+	userQuery := models.UserQuery{
+		User: models.User{
+			Merchant: resp,
+		},
+	}
+
+	relatedUsers, err := svc.userRepo.GetAll(ctx, userQuery)
+
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return merchant.Serialize(nil), err
+	}
+	var relatedUserPublic []*models.PublicUser
+	for _, reladedUser := range relatedUsers {
+		serializedUser := reladedUser.Serialize()
+		relatedUserPublic = append(relatedUserPublic, &serializedUser)
+	}
+
+	return resp.Serialize(relatedUserPublic), err
+
 }
 
 func NewMerchantService(

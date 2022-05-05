@@ -21,6 +21,7 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 	router.Post("/signup", userController.SignUp)
 	router.Get("/users", userController.GetAll)
 	router.Post("/merchants", merchantController.Create)
+	router.Get("/merchants/{id}", merchantController.Get)
 
 	return router
 
