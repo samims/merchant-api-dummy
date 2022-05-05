@@ -36,7 +36,7 @@ func (svc *userService) SignUp(ctx context.Context, user models.User) (models.Pu
 
 // GetAll is a service that returns all users
 func (svc *userService) GetAll(ctx context.Context) ([]models.PublicUser, error) {
-	users, err := svc.userRepo.GetAll(ctx, models.UserQuery{})
+	users, _, err := svc.userRepo.GetAll(ctx, models.UserQuery{})
 	if err != nil {
 		logger.Log.WithError(err).Error("GetAll_userService")
 		return nil, err

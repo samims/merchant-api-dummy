@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/astaxie/beego/orm"
 	"github.com/samims/merchant-api/app/models"
+	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/logger"
 )
 
@@ -58,6 +60,9 @@ func (repo *merchantRepo) FindOne(ctx context.Context, merchant models.Merchant)
 
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
+		if err == orm.ErrNoRows {
+			return nil, errors.New(constants.MerchantNotFound)
+		}
 		return nil, err
 	}
 	return &merchant, nil

@@ -13,6 +13,6 @@ type BaseModel struct {
 
 // Pagination is common models to contain pagination data
 type Pagination struct {
-	Page  *int64 `json:"page"`
-	Limit *int64 `json:"limit"`
+	Page *int64 `json:"page"`
+	Size *int64 `json:"size"`
 }

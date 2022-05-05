@@ -39,11 +39,10 @@ func init() {
 
 // PublicUser represents a user of the system without sensitive information
 type PublicUser struct {
-	ID        int64     `json:"id"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Merchant  *Merchant `json:"merchant"`
+	ID        int64  `json:"id"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 // Serialize serializes user to PublicUser
@@ -53,7 +52,6 @@ func (u *User) Serialize() PublicUser {
 		Email:     u.Email,
 		FirstName: u.FirstName,
 		LastName:  u.LastName,
-		Merchant:  u.Merchant,
 	}
 }
 

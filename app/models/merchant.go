@@ -41,15 +41,22 @@ type PublicMerchant struct {
 	URL  string `json:"url"`
 	Code string `json:"code"`
 
-	Team []*PublicUser `json:"team"`
+	Members []*PublicUser `json:"members"`
 }
 
-func (m *Merchant) Serialize(team []*PublicUser) PublicMerchant {
+func (m *Merchant) Serialize(members []*PublicUser) PublicMerchant {
 	return PublicMerchant{
-		Id:   m.Id,
-		Name: m.Name,
-		URL:  m.URL,
-		Code: m.Code,
-		Team: team,
+		Id:      m.Id,
+		Name:    m.Name,
+		URL:     m.URL,
+		Code:    m.Code,
+		Members: members,
 	}
+}
+
+type TeamMemberResponse struct {
+	CurrentPage int64        `json:"current_page"`
+	TotalPage   int64        `json:"total_page"`
+	TotalRecord int64        `json:"total_record"`
+	Members     []PublicUser `json:"members"`
 }
