@@ -9,11 +9,13 @@ import (
 type Services interface {
 	PingService() services.PingService
 	UserService() services.UserService
+	MerchantService() services.MerchantService
 }
 
 type svc struct {
-	pingService services.PingService
-	userService services.UserService
+	pingService     services.PingService
+	userService     services.UserService
+	merchantService services.MerchantService
 }
 
 func (svc *svc) PingService() services.PingService {
@@ -24,16 +26,24 @@ func (svc *svc) UserService() services.UserService {
 	return svc.userService
 }
 
+func (svc *svc) MerchantService() services.MerchantService {
+	return svc.merchantService
+
+}
+
 func InitServices(cfg config.Configuration) Services {
 	db := cfg.PostgresConfig().GetDB()
 
 	userRepo := repository.NewUserRepo(db)
+	merchantRepo := repository.NewMerchantRepo(db)
 
 	pingSvc := services.NewPingService()
 	userSvc := services.NewUserService(userRepo)
+	merchantSvc := services.NewMerchantService(merchantRepo, userRepo)
 
 	return &svc{
-		pingService: pingSvc,
-		userService: userSvc,
+		pingService:     pingSvc,
+		userService:     userSvc,
+		merchantService: merchantSvc,
 	}
 }

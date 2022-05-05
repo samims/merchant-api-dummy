@@ -10,3 +10,9 @@ type BaseModel struct {
 	CreatedAt time.Time `json:"created_at" orm:"auto_now_add;type(datetime)"`
 	UpdatedAt time.Time `json:"updated_at" orm:"auto_now;type(datetime)"`
 }
+
+// Pagination is common models to contain pagination data
+type Pagination struct {
+	Page  *int64 `json:"page"`
+	Limit *int64 `json:"limit"`
+}

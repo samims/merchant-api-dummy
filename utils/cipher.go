@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/google/uuid"
 	"github.com/samims/merchant-api/logger"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,4 +27,15 @@ func ValidateBCryptHash(s, hashedString string) error {
 		return err
 	}
 	return nil
+}
+
+// GenerateUUIDString generates a UUID string
+func GenerateUUIDString() (string, error) {
+	generatedUUID, err := uuid.NewRandom()
+	if err != nil {
+		logger.Log.WithError(err).Error("GenerateUUIDString")
+		return "", err
+	}
+	return generatedUUID.String(), nil
+
 }

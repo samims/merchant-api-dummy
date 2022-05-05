@@ -10,7 +10,7 @@ import (
 
 type UserRepo interface {
 	Save(context.Context, *models.User) error
-	GetAll(context.Context) ([]models.User, error)
+	GetAll(context.Context, models.UserQuery) ([]models.User, error)
 }
 
 type userRepo struct {
@@ -34,10 +34,13 @@ func (repo *userRepo) Save(ctx context.Context, doc *models.User) error {
 }
 
 // get user list
-func (repo *userRepo) GetAll(ctx context.Context) ([]models.User, error) {
+func (repo *userRepo) GetAll(ctx context.Context, query models.UserQuery) ([]models.User, error) {
 	var users []models.User
 	groupError := "GetUserList_userRepo"
 	qs := repo.db.QueryTable(new(models.User))
+	if query.Merchant != nil && query.Merchant.Id != 0 {
+		qs = qs.Filter("merchant_id", query.Merchant.Id)
+	}
 	qs = qs.RelatedSel()
 	_, err := qs.All(&users)
 

@@ -15,10 +15,12 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 
 	pingController := controllers.NewPing(cfg, svc)
 	userController := controllers.NewUser(cfg, svc)
+	merchantController := controllers.NewMerchant(cfg, svc)
 
 	router.Get("/ping", pingController.Get)
 	router.Post("/signup", userController.SignUp)
 	router.Get("/users", userController.GetAll)
+	router.Post("/merchants", merchantController.Create)
 
 	return router
 

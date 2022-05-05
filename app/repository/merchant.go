@@ -11,6 +11,7 @@ import (
 type MerchantRepo interface {
 	Save(context.Context, *models.Merchant) error
 	GetAll(context.Context) ([]models.Merchant, error)
+	FindOne(context.Context, models.Merchant) (*models.Merchant, error)
 }
 
 type merchantRepo struct {
@@ -41,6 +42,25 @@ func (repo *merchantRepo) GetAll(ctx context.Context) ([]models.Merchant, error)
 	}
 
 	return merchants, nil
+}
+
+// FindOne fetch one object by query
+func (repo *merchantRepo) FindOne(ctx context.Context, merchant models.Merchant) (*models.Merchant, error) {
+	groupError := "FindOne_merchantRepo"
+	qs := repo.db.QueryTable(new(models.Merchant))
+	if merchant.Id != 0 {
+		qs = qs.Filter("id", merchant.Id)
+	}
+	if len(merchant.Code) != 0 {
+		qs = qs.Filter("code", merchant.Code)
+	}
+	err := qs.One(&merchant)
+
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return nil, err
+	}
+	return &merchant, nil
 }
 
 func NewMerchantRepo(db orm.Ormer) MerchantRepo {

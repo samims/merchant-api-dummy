@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-playground/validator/v10 v10.11.0
+	github.com/google/uuid v1.3.0
 	github.com/lib/pq v1.10.5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.11.0

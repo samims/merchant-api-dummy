@@ -56,3 +56,8 @@ func (u *User) Serialize() PublicUser {
 		Merchant:  u.Merchant,
 	}
 }
+
+type UserQuery struct {
+	User
+	Pagination *Pagination
+}

@@ -49,8 +49,6 @@ func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Log.Error(user)
-
 	resp, err := ctlr.svc.UserService().SignUp(ctx, user)
 
 	utils.Renderer(w, resp, err)
