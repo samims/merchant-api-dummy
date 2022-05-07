@@ -20,6 +20,7 @@ import (
 type Merchant interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Get(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 	GetTeamMembers(w http.ResponseWriter, r *http.Request)
 	AddTeamMember(w http.ResponseWriter, r *http.Request)
 	RemoveTeamMember(w http.ResponseWriter, r *http.Request)
@@ -72,6 +73,32 @@ func (ctrl *merchant) Get(w http.ResponseWriter, r *http.Request) {
 	merchantPublic, err := ctrl.svc.MerchantService().Get(ctx, merchantId)
 	utils.Renderer(w, merchantPublic, err)
 
+}
+
+func (ctrl *merchant) Update(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	merhcantID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, err)
+	}
+
+	var merchant models.Merchant
+	err = json.Unmarshal(body, &merchant)
+
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.InternalServerError))
+		return
+	}
+	merchantPublic, err := ctrl.svc.MerchantService().Update(ctx, merhcantID, merchant)
+	utils.Renderer(w, merchantPublic, err)
 }
 
 func (ctrl *merchant) GetTeamMembers(w http.ResponseWriter, r *http.Request) {

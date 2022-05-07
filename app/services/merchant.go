@@ -9,11 +9,13 @@ import (
 	"github.com/samims/merchant-api/app/repository"
 	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/logger"
+	"github.com/samims/merchant-api/utils"
 )
 
 type MerchantService interface {
 	Create(context.Context, models.Merchant) (models.PublicMerchant, error)
 	Get(context.Context, int64) (models.PublicMerchant, error)
+	Update(context.Context, int64, models.Merchant) (models.PublicMerchant, error)
 	GetTeamMembers(context.Context, int64, *int64, *int64) (models.TeamMemberResponse, error)
 	AddTeamMember(context.Context, int64, int64) (map[string]interface{}, error)
 	RemoveTeamMember(context.Context, int64, int64) (map[string]interface{}, error)
@@ -30,40 +32,16 @@ func (svc *merchantService) Create(ctx context.Context, merchant models.Merchant
 	err := merchant.AssignCode()
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
-		return merchant.Serialize(nil), err
+		return merchant.Serialize(), err
 	}
 
 	err = svc.merchantRepo.Save(ctx, &merchant)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
-		return merchant.Serialize(nil), err
+		return merchant.Serialize(), err
 	}
 
-	/*
-		merchant := Merchant{
-			id 1
-			url 'abc.com'
-			teams []
-		}
-	*/
-	userQuery := models.UserQuery{
-		User: models.User{
-			Merchant: &merchant,
-		},
-	}
-
-	relatedUsers, _, err := svc.userRepo.GetAll(ctx, userQuery)
-	if err != nil {
-		logger.Log.WithError(err).Error(groupError)
-		return merchant.Serialize(nil), err
-	}
-	var relatedUserPublic []*models.PublicUser
-	for _, reladedUser := range relatedUsers {
-		serializedUser := reladedUser.Serialize()
-		relatedUserPublic = append(relatedUserPublic, &serializedUser)
-	}
-
-	return merchant.Serialize(relatedUserPublic), err
+	return merchant.Serialize(), err
 }
 
 func (svc *merchantService) Get(ctx context.Context, id int64) (models.PublicMerchant, error) {
@@ -78,25 +56,29 @@ func (svc *merchantService) Get(ctx context.Context, id int64) (models.PublicMer
 		return models.PublicMerchant{}, err
 	}
 
-	userQuery := models.UserQuery{
-		User: models.User{
-			Merchant: merchant,
-		},
+	return merchant.Serialize(), err
+
+}
+
+func (svc *merchantService) Update(ctx context.Context, id int64, doc models.Merchant) (models.PublicMerchant, error) {
+	groupError := "Update_merchantService"
+	merchantQ := models.Merchant{
+		BaseModel: models.BaseModel{Id: id},
 	}
-
-	relatedUsers, _, err := svc.userRepo.GetAll(ctx, userQuery)
-
+	merchant, err := svc.merchantRepo.FindOne(ctx, merchantQ)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
-		return merchant.Serialize(nil), err
+		return models.PublicMerchant{}, err
 	}
-	var relatedUserPublic []*models.PublicUser
-	for _, reladedUser := range relatedUsers {
-		serializedUser := reladedUser.Serialize()
-		relatedUserPublic = append(relatedUserPublic, &serializedUser)
-	}
+	merchant.Name = utils.CheckAndSetString(merchant.Name, doc.Name)
+	merchant.URL = utils.CheckAndSetString(merchant.URL, doc.URL)
 
-	return merchant.Serialize(relatedUserPublic), err
+	err = svc.merchantRepo.Update(ctx, merchant, []string{"name", "url"})
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return models.PublicMerchant{}, err
+	}
+	return merchant.Serialize(), err
 
 }
 

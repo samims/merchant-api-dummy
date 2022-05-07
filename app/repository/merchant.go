@@ -12,6 +12,7 @@ import (
 
 type MerchantRepo interface {
 	Save(context.Context, *models.Merchant) error
+	Update(context.Context, *models.Merchant, []string) error
 	GetAll(context.Context) ([]models.Merchant, error)
 	FindOne(context.Context, models.Merchant) (*models.Merchant, error)
 }
@@ -30,6 +31,17 @@ func (repo *merchantRepo) Save(ctx context.Context, doc *models.Merchant) error 
 	doc.Id = id
 	return nil
 
+}
+
+func (repo *merchantRepo) Update(ctx context.Context, doc *models.Merchant, fieldsToUpdate []string) error {
+	groupError := "Update_merchantRepo"
+
+	_, err := repo.db.Update(doc, fieldsToUpdate...)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+	}
+
+	return err
 }
 
 func (repo *merchantRepo) GetAll(ctx context.Context) ([]models.Merchant, error) {

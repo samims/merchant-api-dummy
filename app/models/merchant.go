@@ -41,16 +41,16 @@ type PublicMerchant struct {
 	URL  string `json:"url"`
 	Code string `json:"code"`
 
-	Members []*PublicUser `json:"members"`
+	// Members []*PublicUser `json:"members"`
 }
 
-func (m *Merchant) Serialize(members []*PublicUser) PublicMerchant {
+func (m *Merchant) Serialize() PublicMerchant {
 	return PublicMerchant{
-		Id:      m.Id,
-		Name:    m.Name,
-		URL:     m.URL,
-		Code:    m.Code,
-		Members: members,
+		Id:   m.Id,
+		Name: m.Name,
+		URL:  m.URL,
+		Code: m.Code,
+		// Members: members,
 	}
 }
 
