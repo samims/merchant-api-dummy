@@ -16,11 +16,9 @@ type ErrorResponse struct {
 
 // Renderer is a function that handles the success response
 func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
-	logger.Log.Info(errList)
 	groupError := "Renderer"
-	// error handling for the response
-
 	w.Header().Add("Content-Type", "application/json")
+
 	erroResp := []ErrorResponse{}
 	for _, err := range errList {
 
@@ -40,7 +38,6 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 
 	}
 	if len(erroResp) == 0 {
-		w.Header().Add("Content-Type", "application/json")
 
 		jsonResp, err := json.Marshal(data)
 		if err != nil {
@@ -48,10 +45,11 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
+		// for success resp
 		w.Write(jsonResp)
 		return
 	}
+	// error response
 	w.WriteHeader(http.StatusBadRequest)
 
 	jsonResp, err := json.Marshal(erroResp)
@@ -60,7 +58,7 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	// write the error response body
 	w.Write(jsonResp)
 
 }
