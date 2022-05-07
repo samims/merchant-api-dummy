@@ -208,11 +208,12 @@ func (svc *merchantService) RemoveTeamMember(ctx context.Context, merchantId int
 		return res, err
 	}
 
-	if user.Merchant != nil && user.Merchant.Id != merchantId {
-		return res, errors.New(constants.UserNotPartOfCurrentMerchant)
-	}
 	if user.Merchant == nil {
 		return res, errors.New(constants.UserNotPartOfAnyMerchant)
+	}
+
+	if user.Merchant.Id != merchantId {
+		return res, errors.New(constants.UserNotPartOfCurrentMerchant)
 	}
 
 	user.Merchant = nil
