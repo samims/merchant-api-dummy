@@ -8,11 +8,13 @@ import (
 	"github.com/samims/merchant-api/app/repository"
 	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/logger"
+	"github.com/samims/merchant-api/utils"
 )
 
 type UserService interface {
 	SignUp(context.Context, models.User) (models.PublicUser, error)
 	GetAll(context.Context) ([]models.PublicUser, error)
+	Update(context.Context, int64, models.User) (models.PublicUser, error)
 }
 
 type userService struct {
@@ -46,6 +48,31 @@ func (svc *userService) GetAll(ctx context.Context) ([]models.PublicUser, error)
 		publicUsers[i] = user.Serialize()
 	}
 	return publicUsers, nil
+
+}
+
+func (svc *userService) Update(ctx context.Context, id int64, doc models.User) (models.PublicUser, error) {
+	grouptError := "Updateuser_repository"
+
+	userQ := models.User{
+		BaseModel: models.BaseModel{Id: id},
+	}
+	user, err := svc.userRepo.FindOne(ctx, userQ)
+	if err != nil {
+		logger.Log.WithError(err).Error(grouptError)
+		return models.PublicUser{}, nil
+	}
+
+	user.FirstName = utils.CheckAndSetString(user.FirstName, doc.FirstName)
+	user.LastName = utils.CheckAndSetString(user.LastName, doc.LastName)
+	user.Email = utils.CheckAndSetString(user.Email, doc.Email)
+
+	err = svc.userRepo.Update(ctx, user, []string{"first_name", "last_name", "email"})
+	if err != nil {
+		logger.Log.WithError(err).Error(grouptError)
+		return models.PublicUser{}, err
+	}
+	return user.Serialize(), nil
 
 }
 

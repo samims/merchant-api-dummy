@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/samims/merchant-api/app"
 	"github.com/samims/merchant-api/app/models"
 	"github.com/samims/merchant-api/config"
@@ -16,6 +18,7 @@ import (
 type User interface {
 	SignUp(http.ResponseWriter, *http.Request)
 	GetAll(http.ResponseWriter, *http.Request)
+	Update(http.ResponseWriter, *http.Request)
 }
 
 type user struct {
@@ -66,6 +69,38 @@ func (ctlr *user) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 	userBytes, _ := json.Marshal(svc_resp)
 	w.Write(userBytes)
+}
+
+func (ctlr *user) Update(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	userID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+
+	if err != nil {
+		logger.Log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var user models.User
+
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		logger.Log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	userPublic, err := ctlr.svc.UserService().Update(ctx, userID, user)
+	utils.Renderer(w, userPublic, err)
+
 }
 
 func NewUser(cfg config.Configuration, svc app.Services) User {

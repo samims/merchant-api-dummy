@@ -20,6 +20,7 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 	router.Get("/ping", pingController.Get)
 	router.Post("/signup", userController.SignUp)
 	router.Get("/users", userController.GetAll)
+	router.Patch("/users/{id}", userController.Update)
 	router.Post("/merchants", merchantController.Create)
 	router.Get("/merchants/{id}", merchantController.Get)
 	router.Patch("/merchants/{id}", merchantController.Update)
