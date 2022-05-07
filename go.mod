@@ -6,18 +6,24 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/google/uuid v1.3.0
+	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
 	github.com/lib/pq v1.10.5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.11.0
+	github.com/stretchr/testify v1.7.1
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 )
 
 require (
+	github.com/corpix/uarand v0.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.1.1 // indirect
 )
 
 require (
