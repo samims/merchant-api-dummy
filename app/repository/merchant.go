@@ -14,6 +14,7 @@ type MerchantRepo interface {
 	Save(context.Context, *models.Merchant) error
 	Update(context.Context, *models.Merchant, []string) error
 	GetAll(context.Context) ([]models.Merchant, error)
+	Delete(context.Context, models.Merchant) error
 	FindOne(context.Context, models.Merchant) (*models.Merchant, error)
 }
 
@@ -44,10 +45,21 @@ func (repo *merchantRepo) Update(ctx context.Context, doc *models.Merchant, fiel
 	return err
 }
 
+// Delete merchant by id
+func (repo *merchantRepo) Delete(ctx context.Context, merchant models.Merchant) error {
+	groupError := "Delete_merchantRepo"
+	_, err := repo.db.Delete(&merchant)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return err
+	}
+	return nil
+}
+
 func (repo *merchantRepo) GetAll(ctx context.Context) ([]models.Merchant, error) {
 	var merchants []models.Merchant
 	groupError := "GetMerchantList_merchantRepo"
-	qs := repo.db.QueryTable(new(models.Merchant))
+	qs := repo.db.QueryTable(new(models.Merchant)).OrderBy("-created_at")
 	_, err := qs.All(&merchants)
 
 	if err != nil {

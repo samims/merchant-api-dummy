@@ -23,6 +23,7 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 	router.Post("/merchants", merchantController.Create)
 	router.Get("/merchants/{id}", merchantController.Get)
 	router.Patch("/merchants/{id}", merchantController.Update)
+	router.Delete("/merchants/{id}", merchantController.Delete)
 	router.Get("/merchants/{id}/members", merchantController.GetTeamMembers)
 	router.Post("/merchants/{id}/members", merchantController.AddTeamMember)
 	router.Delete("/merchants/{id}/members", merchantController.RemoveTeamMember)

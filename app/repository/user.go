@@ -41,7 +41,7 @@ func (repo *userRepo) Save(ctx context.Context, doc *models.User) error {
 func (repo *userRepo) GetAll(ctx context.Context, query models.UserQuery) ([]models.User, int64, error) {
 	var users []models.User
 	groupError := "GetUserList_userRepo"
-	qs := repo.db.QueryTable(new(models.User))
+	qs := repo.db.QueryTable(new(models.User)).OrderBy("-created_at")
 
 	if query.Pagination != nil && query.Pagination.Page != nil && query.Pagination.Size != nil {
 		// using pointer in pagination to make sure it will be nil if not set rather than 0
@@ -59,7 +59,7 @@ func (repo *userRepo) GetAll(ctx context.Context, query models.UserQuery) ([]mod
 		logger.Log.WithError(err).Error(groupError)
 		return nil, 0, err
 	}
-	// Count ignores pagination and returns total number of records without limit and offset
+	// Count ignores pagination and returns total number of records without limit
 	count, err := qs.Count()
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)

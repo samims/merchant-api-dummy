@@ -16,6 +16,7 @@ type MerchantService interface {
 	Create(context.Context, models.Merchant) (models.PublicMerchant, error)
 	Get(context.Context, int64) (models.PublicMerchant, error)
 	Update(context.Context, int64, models.Merchant) (models.PublicMerchant, error)
+	Delete(context.Context, int64) (map[string]interface{}, error)
 	GetTeamMembers(context.Context, int64, *int64, *int64) (models.TeamMemberResponse, error)
 	AddTeamMember(context.Context, int64, int64) (map[string]interface{}, error)
 	RemoveTeamMember(context.Context, int64, int64) (map[string]interface{}, error)
@@ -79,6 +80,32 @@ func (svc *merchantService) Update(ctx context.Context, id int64, doc models.Mer
 		return models.PublicMerchant{}, err
 	}
 	return merchant.Serialize(), err
+
+}
+
+// Delete merchant
+func (svc *merchantService) Delete(ctx context.Context, id int64) (map[string]interface{}, error) {
+	groupError := "Delete_merchantService"
+	resp := map[string]interface{}{
+		"success": false,
+	}
+	merchantQ := models.Merchant{
+		BaseModel: models.BaseModel{Id: id},
+	}
+
+	_, err := svc.merchantRepo.FindOne(ctx, merchantQ)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return resp, err
+	}
+
+	err = svc.merchantRepo.Delete(ctx, merchantQ)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return resp, err
+	}
+	resp["success"] = true
+	return resp, nil
 
 }
 

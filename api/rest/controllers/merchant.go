@@ -21,6 +21,7 @@ type Merchant interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Get(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
 	GetTeamMembers(w http.ResponseWriter, r *http.Request)
 	AddTeamMember(w http.ResponseWriter, r *http.Request)
 	RemoveTeamMember(w http.ResponseWriter, r *http.Request)
@@ -99,6 +100,18 @@ func (ctrl *merchant) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	merchantPublic, err := ctrl.svc.MerchantService().Update(ctx, merhcantID, merchant)
 	utils.Renderer(w, merchantPublic, err)
+}
+
+func (ctrl *merchant) Delete(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	merchantId, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, err)
+		return
+	}
+	resp, err := ctrl.svc.MerchantService().Delete(ctx, merchantId)
+	utils.Renderer(w, resp, err)
 }
 
 func (ctrl *merchant) GetTeamMembers(w http.ResponseWriter, r *http.Request) {
