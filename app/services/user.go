@@ -61,7 +61,7 @@ func (svc *userService) Update(ctx context.Context, id int64, doc models.User) (
 	user, err := svc.userRepo.FindOne(ctx, userQ)
 	if err != nil {
 		logger.Log.WithError(err).Error(grouptError)
-		return models.PublicUser{}, nil
+		return models.PublicUser{}, err
 	}
 
 	user.FirstName = utils.CheckAndSetString(user.FirstName, doc.FirstName)

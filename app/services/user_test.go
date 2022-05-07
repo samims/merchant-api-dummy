@@ -108,6 +108,80 @@ func (suite *UserServiceTestSuite) TestSignUpFailsForDatabaseError() {
 
 }
 
+// TestGetAllSuccess tests that get all success in ideal case
+func (suite *UserServiceTestSuite) TestGetAllSuccess() {
+	// Arrange
+	users := []models.User{
+		suite.user,
+	}
+
+	// mock
+	suite.mockUserRepo.On("GetAll", suite.ctx, mock.Anything).Return(users, int64(len(users)), nil)
+
+	// Act
+	result, err := suite.SUT.GetAll(suite.ctx)
+
+	// Assert
+	suite.NoError(err)
+	suite.Equal(len(result), len(users))
+}
+
+// TestGetAllFailsForDatabaseError tests that get all fails for database error
+func (suite *UserServiceTestSuite) TestGetAllFailsForDatabaseError() {
+	// mock
+	suite.mockUserRepo.On("GetAll", suite.ctx, mock.Anything).Return(nil, int64(0), orm.ErrStmtClosed)
+
+	// Act
+	result, err := suite.SUT.GetAll(suite.ctx)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(len(result), 0)
+	suite.Equal(err.Error(), orm.ErrStmtClosed.Error())
+}
+
+// TestUpdateSuccess tests that update success in ideal case
+func (suite *UserServiceTestSuite) TestUpdateSuccess() {
+	// mock
+	suite.mockUserRepo.On("FindOne", suite.ctx, mock.Anything).Return(&suite.user, nil)
+	suite.mockUserRepo.On("Update", suite.ctx, mock.Anything, mock.Anything).Return(nil)
+
+	// Act
+	result, err := suite.SUT.Update(suite.ctx, suite.user.Id, suite.user)
+
+	// Assert
+	suite.NoError(err)
+	suite.Equal(result.ID, suite.user.Id)
+
+}
+
+// TestUpdateFailsIfUserNotFound tests that update fails if user not found
+func (suite *UserServiceTestSuite) TestUpdateFailsIfUserNotFound() {
+	// mock
+	suite.mockUserRepo.On("FindOne", suite.ctx, mock.Anything).Return(nil, orm.ErrNoRows)
+
+	// Act
+	_, err := suite.SUT.Update(suite.ctx, suite.user.Id, suite.user)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(err.Error(), orm.ErrNoRows.Error())
+}
+
+// TestUpdateFailsDuringWriteToDatabase tests that update fails during write to database
+func (suite *UserServiceTestSuite) TestUpdateFailsDuringWriteToDatabase() {
+	// mock
+	suite.mockUserRepo.On("FindOne", suite.ctx, mock.Anything).Return(&suite.user, nil)
+	suite.mockUserRepo.On("Update", suite.ctx, mock.Anything, mock.Anything).Return(orm.ErrStmtClosed)
+
+	// Act
+	_, err := suite.SUT.Update(suite.ctx, suite.user.Id, suite.user)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(err.Error(), orm.ErrStmtClosed.Error())
+}
+
 func TestUserService(t *testing.T) {
 	suite.Run(t, new(UserServiceTestSuite))
 }
