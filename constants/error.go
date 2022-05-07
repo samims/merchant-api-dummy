@@ -17,6 +17,7 @@ const (
 	UserIDIsRequired             = "UserIDIsRequired"
 	UserNotFound                 = "UserNotFound"
 	MerchantNotFound             = "MerchantNotFound"
+	ErrorEmptyString             = "ErrorEmptyString"
 )
 
 // ErrorString holds the string version of the error which is sent to the user
@@ -34,6 +35,7 @@ var ErrorString = map[string]string{
 	UserIDIsRequired:             "User id is required",
 	UserNotFound:                 "User not found",
 	MerchantNotFound:             "Merchant not found",
+	ErrorEmptyString:             "The string cannot be empty",
 }
 
 // error code(response status code) constants
@@ -51,4 +53,5 @@ var ErrorCode = map[string]int{
 	UserIDIsRequired:             http.StatusBadRequest,
 	UserNotFound:                 http.StatusNotFound,
 	MerchantNotFound:             http.StatusNotFound,
+	ErrorEmptyString:             http.StatusBadRequest,
 }

@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
+	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/logger"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -10,11 +13,16 @@ import (
 
 // GenerateHash generates a hash from a string
 func GenerateBCryptHash(s string) (string, error) {
+	if len(s) == 0 {
+		return "", errors.New(constants.ErrorEmptyString)
+	}
+
 	hashBytes, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Log.WithError(err).Error("GenerateBCryptHash")
 		return "", err
 	}
+
 	hashString := string(hashBytes)
 	return hashString, nil
 }

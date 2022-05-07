@@ -25,12 +25,13 @@ type userService struct {
 func (svc *userService) SignUp(ctx context.Context, user models.User) (models.PublicUser, error) {
 	groupError := "SignUp_userService"
 
-	if user.GeneratePasswordHash() != nil {
-		logger.Log.WithError(user.GeneratePasswordHash()).Error(groupError)
-		return user.Serialize(), errors.New(constants.InternalServerError)
+	err := user.GeneratePasswordHash()
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return user.Serialize(), errors.New(constants.ErrorEmptyString)
 	}
 
-	err := svc.userRepo.Save(ctx, &user)
+	err = svc.userRepo.Save(ctx, &user)
 	// to remove password hash from response
 	publicUser := user.Serialize()
 	return publicUser, err
