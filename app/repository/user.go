@@ -44,6 +44,7 @@ func (repo *userRepo) GetAll(ctx context.Context, query models.UserQuery) ([]mod
 	qs := repo.db.QueryTable(new(models.User))
 
 	if query.Pagination != nil && query.Pagination.Page != nil && query.Pagination.Size != nil {
+		// using pointer in pagination to make sure it will be nil if not set rather than 0
 		qs = qs.Offset((*query.Pagination.Page - 1) * *query.Pagination.Size).Limit(*query.Pagination.Size)
 	}
 
@@ -58,7 +59,7 @@ func (repo *userRepo) GetAll(ctx context.Context, query models.UserQuery) ([]mod
 		logger.Log.WithError(err).Error(groupError)
 		return nil, 0, err
 	}
-
+	// Count ignores pagination and returns total number of records without limit and offset
 	count, err := qs.Count()
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)

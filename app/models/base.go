@@ -13,6 +13,7 @@ type BaseModel struct {
 
 // Pagination is common models to contain pagination data
 type Pagination struct {
+	// using pointer in pagination to make sure it will be nil if not set rather than 0
 	Page *int64 `json:"page"`
 	Size *int64 `json:"size"`
 }
