@@ -27,8 +27,8 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 		if err == nil {
 			continue
 		}
-		errMsg := constants.ErrorString[err.Error()]
-		if len(errMsg) == 0 {
+		errMsg, ok := constants.ErrorString[err.Error()]
+		if !ok {
 			errMsg = err.Error()
 		}
 
