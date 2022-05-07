@@ -22,10 +22,8 @@ type UserServiceTestSuite struct {
 	mockUserRepo *mocks.UserRepoMock
 
 	// stub
-	user1 models.User
-	user2 models.User
-
-	SUT UserService
+	user models.User
+	SUT  UserService
 }
 
 // SetupTest is called before each test
@@ -33,13 +31,7 @@ func (suite *UserServiceTestSuite) SetupTest() {
 	suite.ctx = context.Background()
 	suite.mockUserRepo = mocks.NewUserRepoMock(suite.T())
 
-	suite.user1 = models.User{
-		Email:        fake.EmailAddress(),
-		FirstName:    fake.FirstName(),
-		LastName:     fake.LastName(),
-		PasswordHash: fake.CharactersN(10),
-	}
-	suite.user2 = models.User{
+	suite.user = models.User{
 		Email:        fake.EmailAddress(),
 		FirstName:    fake.FirstName(),
 		LastName:     fake.LastName(),
@@ -61,7 +53,7 @@ func (suite *UserServiceTestSuite) TestSignUpSuccess() {
 	})
 
 	// Act
-	result, err := suite.SUT.SignUp(suite.ctx, suite.user1)
+	result, err := suite.SUT.SignUp(suite.ctx, suite.user)
 
 	// Assert
 	suite.NoError(err)
@@ -77,7 +69,7 @@ func (suite *UserServiceTestSuite) TestEmailNeedToBeUnique() {
 	suite.mockUserRepo.On("Save", suite.ctx, mock.Anything).Return(errors.New(constants.UniqueEmailError))
 
 	// Act
-	result, err := suite.SUT.SignUp(suite.ctx, suite.user1)
+	result, err := suite.SUT.SignUp(suite.ctx, suite.user)
 
 	// Assert
 	suite.Error(err)
@@ -89,10 +81,10 @@ func (suite *UserServiceTestSuite) TestEmailNeedToBeUnique() {
 // TestSignUpFailsForPasswordHasGenerationError tests that sign up fails for password has generation error
 func (suite *UserServiceTestSuite) TestSignUpFailsForPasswordHasGenerationError() {
 	// Arrange
-	suite.user1.PasswordHash = ""
+	suite.user.PasswordHash = ""
 
 	// Act
-	result, err := suite.SUT.SignUp(suite.ctx, suite.user1)
+	result, err := suite.SUT.SignUp(suite.ctx, suite.user)
 
 	// Assert
 	suite.Error(err)
@@ -107,7 +99,7 @@ func (suite *UserServiceTestSuite) TestSignUpFailsForDatabaseError() {
 	suite.mockUserRepo.On("Save", suite.ctx, mock.Anything).Return(orm.ErrStmtClosed)
 
 	// Act
-	result, err := suite.SUT.SignUp(suite.ctx, suite.user1)
+	result, err := suite.SUT.SignUp(suite.ctx, suite.user)
 
 	// Assert
 	suite.Error(err)
