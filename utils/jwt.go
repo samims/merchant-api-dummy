@@ -5,7 +5,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/samims/merchant-api/constants"
-	"github.com/samims/merchant-api/logger"
 )
 
 func GenerateJWT(id int64, email, secretKey string) (string, error) {
@@ -22,7 +21,7 @@ func GenerateJWT(id int64, email, secretKey string) (string, error) {
 	tokenString, err := token.SignedString(mySigningKey)
 
 	if err != nil {
-		logger.Log.Error("Something Went Wrong: %s", err.Error())
+
 		return "", err
 	}
 	return tokenString, nil

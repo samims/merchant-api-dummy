@@ -142,12 +142,14 @@ func (suite *UserServiceTestSuite) TestGetAllFailsForDatabaseError() {
 
 // TestUpdateSuccess tests that update success in ideal case
 func (suite *UserServiceTestSuite) TestUpdateSuccess() {
+	// Arrange
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, suite.user.Id)
 	// mock
-	suite.mockUserRepo.On("FindOne", suite.ctx, mock.Anything).Return(&suite.user, nil)
-	suite.mockUserRepo.On("Update", suite.ctx, mock.Anything, mock.Anything).Return(nil)
+	suite.mockUserRepo.On("FindOne", ctx, mock.Anything).Return(&suite.user, nil)
+	suite.mockUserRepo.On("Update", ctx, mock.Anything, mock.Anything).Return(nil)
 
 	// Act
-	result, err := suite.SUT.Update(suite.ctx, suite.user.Id, suite.user)
+	result, err := suite.SUT.Update(ctx, suite.user.Id, suite.user)
 
 	// Assert
 	suite.NoError(err)
@@ -157,11 +159,13 @@ func (suite *UserServiceTestSuite) TestUpdateSuccess() {
 
 // TestUpdateFailsIfUserNotFound tests that update fails if user not found
 func (suite *UserServiceTestSuite) TestUpdateFailsIfUserNotFound() {
+	// Arrange
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, suite.user.Id)
 	// mock
-	suite.mockUserRepo.On("FindOne", suite.ctx, mock.Anything).Return(nil, orm.ErrNoRows)
+	suite.mockUserRepo.On("FindOne", ctx, mock.Anything).Return(nil, orm.ErrNoRows)
 
 	// Act
-	_, err := suite.SUT.Update(suite.ctx, suite.user.Id, suite.user)
+	_, err := suite.SUT.Update(ctx, suite.user.Id, suite.user)
 
 	// Assert
 	suite.Error(err)
@@ -170,12 +174,14 @@ func (suite *UserServiceTestSuite) TestUpdateFailsIfUserNotFound() {
 
 // TestUpdateFailsDuringWriteToDatabase tests that update fails during write to database
 func (suite *UserServiceTestSuite) TestUpdateFailsDuringWriteToDatabase() {
+	// Arrange
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, suite.user.Id)
 	// mock
-	suite.mockUserRepo.On("FindOne", suite.ctx, mock.Anything).Return(&suite.user, nil)
-	suite.mockUserRepo.On("Update", suite.ctx, mock.Anything, mock.Anything).Return(orm.ErrStmtClosed)
+	suite.mockUserRepo.On("FindOne", ctx, mock.Anything).Return(&suite.user, nil)
+	suite.mockUserRepo.On("Update", ctx, mock.Anything, mock.Anything).Return(orm.ErrStmtClosed)
 
 	// Act
-	_, err := suite.SUT.Update(suite.ctx, suite.user.Id, suite.user)
+	_, err := suite.SUT.Update(ctx, suite.user.Id, suite.user)
 
 	// Assert
 	suite.Error(err)

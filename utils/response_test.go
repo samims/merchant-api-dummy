@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/utils/mocks"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -34,7 +35,7 @@ func (suite *ResponseUtilsTestSuite) TestRendererForSuccessShouldWriteData() {
 
 	// mock
 	suite.mockedResponseWriter.On("Header").Return(suite.mockedHeader)
-
+	suite.mockedResponseWriter.On("WriteHeader", mock.Anything).Return()
 	suite.mockedResponseWriter.On("Write", mock.Anything).Return(0, nil)
 
 	// Act
@@ -42,6 +43,7 @@ func (suite *ResponseUtilsTestSuite) TestRendererForSuccessShouldWriteData() {
 
 	// Assert
 	suite.mockedResponseWriter.AssertCalled(suite.T(), "Header")
+	suite.mockedResponseWriter.AssertCalled(suite.T(), "WriteHeader", mock.Anything)
 	suite.mockedResponseWriter.AssertCalled(suite.T(), "Write", mock.Anything)
 
 }
@@ -50,12 +52,11 @@ func (suite *ResponseUtilsTestSuite) TestRendererForSuccessShouldWriteData() {
 func (suite *ResponseUtilsTestSuite) TestRendererForFailureShouldWriteError() {
 	// Arrange
 	data := map[string]interface{}{"test": "test"}
-	err := errors.New("test error")
+	err := errors.New(constants.ErorNameIsNotValid)
 
 	// mock
 	suite.mockedResponseWriter.On("Header").Return(suite.mockedHeader)
 	suite.mockedResponseWriter.On("WriteHeader", mock.Anything).Return()
-
 	suite.mockedResponseWriter.On("Write", mock.Anything).Return(0, nil)
 
 	// Act
@@ -63,8 +64,8 @@ func (suite *ResponseUtilsTestSuite) TestRendererForFailureShouldWriteError() {
 
 	// Assert
 	suite.mockedResponseWriter.AssertCalled(suite.T(), "Header")
-	suite.mockedResponseWriter.AssertCalled(suite.T(), "Write", mock.Anything)
 	suite.mockedResponseWriter.AssertCalled(suite.T(), "WriteHeader", mock.Anything)
+	suite.mockedResponseWriter.AssertCalled(suite.T(), "Write", mock.Anything)
 }
 
 func TestResponseUtil(t *testing.T) {
