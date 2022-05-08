@@ -87,7 +87,7 @@ func (ctlr *user) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := ctlr.svc.UserService().SignIn(ctx, loginModel)
+	resp, err := ctlr.svc.UserService().SignIn(ctx, loginModel, ctlr.cfg.AppConfig().GetSecretKey())
 	utils.Renderer(w, resp, err)
 }
 
