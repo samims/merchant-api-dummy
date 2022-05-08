@@ -14,7 +14,7 @@ type ErrorResponse struct {
 	Details string `json:"details"`
 }
 
-// Renderer is a function that handles the success response
+// Renderer is a function that renders the response for both success and error
 func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 	groupError := "Renderer"
 	w.Header().Add("Content-Type", "application/json")
@@ -62,3 +62,5 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 	w.Write(jsonResp)
 
 }
+
+// set gopath command in terminal
