@@ -20,6 +20,7 @@ type MerchantService interface {
 	GetTeamMembers(context.Context, int64, *int64, *int64) (models.TeamMemberResponse, error)
 	AddTeamMember(context.Context, int64, int64) (map[string]interface{}, error)
 	RemoveTeamMember(context.Context, int64, int64) (map[string]interface{}, error)
+	VerifyObjectPermission(context.Context, int64) error
 }
 
 type merchantService struct {
@@ -27,6 +28,29 @@ type merchantService struct {
 	userRepo     repository.UserRepo
 }
 
+// VerifyObjectPermission checks if the user has permission to access the merchant
+func (ctlr *merchantService) VerifyObjectPermission(ctx context.Context, merchantID int64) error {
+	groupError := "verifyObjectPermission_merchantService"
+
+	userID := ctx.Value(constants.UserIDContextKey).(int64)
+	userQ := models.User{
+		BaseModel: models.BaseModel{Id: userID},
+	}
+
+	user, err := ctlr.userRepo.FindOne(ctx, userQ)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return err
+	}
+	// if user is not part of a merchant, we should return an error
+	if user.Merchant.Id != merchantID {
+		return errors.New(string(constants.PermissionDenied))
+	}
+
+	return nil
+}
+
+// Create merchant service holds the business logic for creating a merchant
 func (svc *merchantService) Create(ctx context.Context, merchant models.Merchant) (models.PublicMerchant, error) {
 	groupError := "Create_merchantService"
 
@@ -96,6 +120,13 @@ func (svc *merchantService) Update(ctx context.Context, id int64, doc models.Mer
 	merchantQ := models.Merchant{
 		BaseModel: models.BaseModel{Id: id},
 	}
+
+	err := svc.VerifyObjectPermission(ctx, id)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return models.PublicMerchant{}, err
+	}
+
 	merchant, err := svc.merchantRepo.FindOne(ctx, merchantQ)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
@@ -116,14 +147,21 @@ func (svc *merchantService) Update(ctx context.Context, id int64, doc models.Mer
 // Delete merchant
 func (svc *merchantService) Delete(ctx context.Context, id int64) (map[string]interface{}, error) {
 	groupError := "Delete_merchantService"
+
 	resp := map[string]interface{}{
 		"success": false,
 	}
+	err := svc.VerifyObjectPermission(ctx, id)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return resp, err
+	}
+
 	merchantQ := models.Merchant{
 		BaseModel: models.BaseModel{Id: id},
 	}
 
-	_, err := svc.merchantRepo.FindOne(ctx, merchantQ)
+	_, err = svc.merchantRepo.FindOne(ctx, merchantQ)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
 		return resp, err
@@ -193,6 +231,13 @@ func (svc *merchantService) AddTeamMember(ctx context.Context, merchantId int64,
 	res := map[string]interface{}{
 		"success": false,
 	}
+
+	err := svc.VerifyObjectPermission(ctx, merchantId)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return res, err
+	}
+
 	merchantQ := models.Merchant{
 		BaseModel: models.BaseModel{Id: merchantId},
 	}
@@ -226,12 +271,21 @@ func (svc *merchantService) AddTeamMember(ctx context.Context, merchantId int64,
 
 func (svc *merchantService) RemoveTeamMember(ctx context.Context, merchantId int64, userId int64) (map[string]interface{}, error) {
 	groupError := "RemoveTeamMember_merchantService"
+
 	res := map[string]interface{}{
 		"success": false,
 	}
+
+	err := svc.VerifyObjectPermission(ctx, merchantId)
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return res, err
+	}
+
 	merchantQ := models.Merchant{
 		BaseModel: models.BaseModel{Id: merchantId},
 	}
+
 	merchant, err := svc.merchantRepo.FindOne(ctx, merchantQ)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
@@ -256,11 +310,13 @@ func (svc *merchantService) RemoveTeamMember(ctx context.Context, merchantId int
 	}
 
 	user.Merchant = nil
+
 	err = svc.userRepo.Update(ctx, user, []string{"merchant_id"})
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
 		return res, err
 	}
+
 	res["success"] = true
 	return res, nil
 }

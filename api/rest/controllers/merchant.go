@@ -88,6 +88,16 @@ func (ctrl *merchant) Get(w http.ResponseWriter, r *http.Request) {
 
 func (ctrl *merchant) Update(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+
+	// get UserID from header
+	userID, err := strconv.ParseInt(r.Header.Get("UserID"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	ctx = context.WithValue(ctx, constants.UserIDContextKey, userID)
+
 	merhcantID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		logger.Log.Error(err)
@@ -114,6 +124,15 @@ func (ctrl *merchant) Update(w http.ResponseWriter, r *http.Request) {
 
 func (ctrl *merchant) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+	// get UserID from header
+	userID, err := strconv.ParseInt(r.Header.Get("UserID"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	ctx = context.WithValue(ctx, constants.UserIDContextKey, userID)
+
 	merchantId, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		logger.Log.Error(err)
@@ -151,6 +170,15 @@ func (ctrl *merchant) GetTeamMembers(w http.ResponseWriter, r *http.Request) {
 
 func (ctrl *merchant) AddTeamMember(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+	// get UserID from header
+	userID, err := strconv.ParseInt(r.Header.Get("UserID"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	ctx = context.WithValue(ctx, constants.UserIDContextKey, userID)
+
 	merchantId, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		logger.Log.Error(err)
@@ -177,6 +205,15 @@ func (ctrl *merchant) AddTeamMember(w http.ResponseWriter, r *http.Request) {
 
 func (ctrl *merchant) RemoveTeamMember(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+	// get UserID from header
+	userID, err := strconv.ParseInt(r.Header.Get("UserID"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	ctx = context.WithValue(ctx, constants.UserIDContextKey, userID)
+
 	merchantId, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		logger.Log.Error(err)
