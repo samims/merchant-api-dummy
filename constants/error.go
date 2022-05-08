@@ -4,11 +4,16 @@ import "net/http"
 
 // error constants
 const (
-	InternalServerError          = "InternalServerError"
-	BadRequest                   = "BadRequest"
-	Unauthorized                 = "Unauthorized"
-	NotFound                     = "NotFound"
-	Conflict                     = "Conflict"
+	InternalServerError = "InternalServerError"
+	BadRequest          = "BadRequest"
+	Unauthorized        = "Unauthorized"
+	NotFound            = "NotFound"
+	Conflict            = "Conflict"
+
+	ErrorTokenNotFound      = "ErrorTokenNotFound"
+	ErrorInvalidAuthToken   = "ErrorInvalidAuthToken"
+	ErrorInvalidCredentials = "ErrorInvalidCredentials"
+
 	UniqueEmailError             = "pq: duplicate key value violates unique constraint \"users_email_key\""
 	PaginationError              = "PaginationError"
 	UserAlreadyPartOfAMerchant   = "UserAlreadyPartOfAMerchant"
@@ -19,7 +24,6 @@ const (
 	UserNotFound                 = "UserNotFound"
 	MerchantNotFound             = "MerchantNotFound"
 	ErrorEmptyString             = "ErrorEmptyString"
-	ErrorInvalidCredentials      = "ErrorInvalidCredentials"
 	PermissionDenied             = "PermissionDenied"
 
 	// Validation errors
@@ -32,11 +36,16 @@ const (
 
 // ErrorString holds the string version of the error which is sent to the user
 var ErrorString = map[string]string{
-	InternalServerError:          "Something went wrong",
-	BadRequest:                   "Bad request",
-	Unauthorized:                 "You are not authorized to perform this action",
-	NotFound:                     "Requested resource not found",
-	Conflict:                     "Resource already exists with this name",
+	InternalServerError: "Something went wrong",
+	BadRequest:          "Bad request",
+	Unauthorized:        "You are not authorized to perform this action",
+	NotFound:            "Requested resource not found",
+	Conflict:            "Resource already exists with this name",
+
+	ErrorTokenNotFound:      "Token not found",
+	ErrorInvalidAuthToken:   "Invalid auth token",
+	ErrorInvalidCredentials: "Invalid credentials",
+
 	UniqueEmailError:             "Email should be unique",
 	PaginationError:              "Pagination error kindly send correct pagination parameters",
 	UserAlreadyPartOfAMerchant:   "User already part of a merchant",
@@ -47,7 +56,6 @@ var ErrorString = map[string]string{
 	UserNotFound:                 "User not found",
 	MerchantNotFound:             "Merchant not found",
 	ErrorEmptyString:             "The string cannot be empty",
-	ErrorInvalidCredentials:      "Invalid credentials",
 	PermissionDenied:             "Permission denied",
 
 	// Validation errors
@@ -60,11 +68,16 @@ var ErrorString = map[string]string{
 
 // error code(response status code) constants
 var ErrorCode = map[string]int{
-	InternalServerError:          http.StatusInternalServerError,
-	BadRequest:                   http.StatusBadRequest,
-	Unauthorized:                 http.StatusUnauthorized,
-	NotFound:                     http.StatusNotFound,
-	Conflict:                     http.StatusConflict,
+	InternalServerError: http.StatusInternalServerError,
+	BadRequest:          http.StatusBadRequest,
+	Unauthorized:        http.StatusUnauthorized,
+	NotFound:            http.StatusNotFound,
+	Conflict:            http.StatusConflict,
+
+	ErrorTokenNotFound:      http.StatusUnauthorized,
+	ErrorInvalidAuthToken:   http.StatusUnauthorized,
+	ErrorInvalidCredentials: http.StatusUnauthorized,
+
 	UniqueEmailError:             http.StatusBadRequest,
 	PaginationError:              http.StatusBadRequest,
 	UserAlreadyPartOfAMerchant:   http.StatusBadRequest,
@@ -75,7 +88,6 @@ var ErrorCode = map[string]int{
 	UserNotFound:                 http.StatusNotFound,
 	MerchantNotFound:             http.StatusNotFound,
 	ErrorEmptyString:             http.StatusBadRequest,
-	ErrorInvalidCredentials:      http.StatusUnauthorized,
 	PermissionDenied:             http.StatusForbidden,
 
 	// Validation errors

@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,24 +8,17 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/samims/merchant-api/config"
-	"github.com/samims/merchant-api/logger"
+	"github.com/samims/merchant-api/constants"
+	"github.com/samims/merchant-api/utils"
 )
-
-//set error message in Error struct
-// func SetError(err Error, message string) Error {
-// 	err.IsError = true
-// 	err.Message = message
-// 	return err
-// }
 
 func IsAuthorized(handler http.HandlerFunc, cfg config.Configuration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		// when request does not have authorization header
 		if r.Header["Authorization"] == nil {
-
-			err := errors.New("no token found")
-			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
-			logger.Log.Error(err)
+			err := errors.New(constants.ErrorTokenNotFound)
+			utils.Renderer(w, nil, err)
 			return
 		}
 
@@ -39,12 +31,11 @@ func IsAuthorized(handler http.HandlerFunc, cfg config.Configuration) http.Handl
 			}
 			return mySigningKey, nil
 		})
-		logger.Log.Error(err)
 
+		// when token is invalid
 		if err != nil {
-			err := errors.New("unauthorized")
-			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
-			w.WriteHeader(http.StatusUnauthorized)
+			err := errors.New(constants.ErrorInvalidAuthToken)
+			utils.Renderer(w, nil, err)
 			return
 		}
 
@@ -57,21 +48,8 @@ func IsAuthorized(handler http.HandlerFunc, cfg config.Configuration) http.Handl
 			r.Header.Set("Email", email)
 			handler.ServeHTTP(w, r)
 			return
-
-			// if claims["role"] == "admin" {
-
-			// 	r.Header.Set("Role", "admin")
-			// 	handler.ServeHTTP(w, r)
-			// 	return
-
-			// } else if claims["role"] == "user" {
-
-			// 	r.Header.Set("Role", "user")
-			// 	handler.ServeHTTP(w, r)
-			// 	return
-			// }
 		}
-		err = errors.New("not authorized")
-		json.NewEncoder(w).Encode(err)
+		err = errors.New(constants.Unauthorized)
+		utils.Renderer(w, nil, err)
 	}
 }
