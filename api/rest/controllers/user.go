@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"github.com/samims/merchant-api/app"
 	"github.com/samims/merchant-api/app/models"
 	"github.com/samims/merchant-api/config"
+	"github.com/samims/merchant-api/constants"
 	"github.com/samims/merchant-api/logger"
 	"github.com/samims/merchant-api/utils"
 )
@@ -104,14 +106,21 @@ func (ctlr *user) GetAll(w http.ResponseWriter, r *http.Request) {
 
 func (ctlr *user) Update(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-
-	userID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	userIdFromURL, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 
 	if err != nil {
 		logger.Log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	userID, err := strconv.ParseInt(r.Header.Get("UserID"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	ctx = context.WithValue(ctx, constants.UserIDContextKey, userID)
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -129,7 +138,7 @@ func (ctlr *user) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userPublic, err := ctlr.svc.UserService().Update(ctx, userID, user)
+	userPublic, err := ctlr.svc.UserService().Update(ctx, userIdFromURL, user)
 	utils.Renderer(w, userPublic, err)
 
 }

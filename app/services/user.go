@@ -94,6 +94,13 @@ func (svc *userService) GetAll(ctx context.Context) ([]models.PublicUser, error)
 func (svc *userService) Update(ctx context.Context, id int64, doc models.User) (models.PublicUser, error) {
 	grouptError := "Updateuser_repository"
 
+	userIdFromContext := ctx.Value(constants.UserIDContextKey).(int64)
+
+	if userIdFromContext != id {
+		logger.Log.WithError(errors.New(constants.PermissionDenied)).Error(grouptError)
+		return models.PublicUser{}, errors.New(constants.PermissionDenied)
+	}
+
 	userQ := models.User{
 		BaseModel: models.BaseModel{Id: id},
 	}

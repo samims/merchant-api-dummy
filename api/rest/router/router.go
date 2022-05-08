@@ -25,7 +25,7 @@ func Init(cfg config.Configuration, svc app.Services) *chi.Mux {
 	router.Post("/signin", userController.SignIn)
 
 	router.Get("/users", middlewares.IsAuthorized(userController.GetAll, cfg))
-	router.Patch("/users/{id}", userController.Update)
+	router.Patch("/users/{id}", middlewares.IsAuthorized(userController.Update, cfg))
 
 	// merchants crud apis
 	router.Post("/merchants", middlewares.IsAuthorized(merchantController.Create, cfg))
