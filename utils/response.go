@@ -19,12 +19,15 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 	groupError := "Renderer"
 	w.Header().Add("Content-Type", "application/json")
 
+	statusCode := http.StatusOK
+
 	erroResp := []ErrorResponse{}
-	for _, err := range errList {
+	for index, err := range errList {
 
 		if err == nil {
 			continue
 		}
+
 		errMsg, ok := constants.ErrorString[err.Error()]
 		if !ok {
 			errMsg = err.Error()
@@ -34,9 +37,19 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 			Message: errMsg,
 			Details: err.Error(),
 		}
+
+		// need to check only for the first error in the list, repeted occurances will be ignored
+		if index == 0 {
+			statusCode, ok = constants.ErrorCode[err.Error()]
+			// if not found, use the default status code
+			if !ok {
+				statusCode = http.StatusInternalServerError
+			}
+		}
 		erroResp = append(erroResp, resp)
 
 	}
+	w.WriteHeader(statusCode)
 	if len(erroResp) == 0 {
 
 		jsonResp, err := json.Marshal(data)
@@ -49,9 +62,8 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 		w.Write(jsonResp)
 		return
 	}
-	// error response
-	w.WriteHeader(http.StatusBadRequest)
 
+	// error response
 	jsonResp, err := json.Marshal(erroResp)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
@@ -62,5 +74,3 @@ func Renderer(w http.ResponseWriter, data interface{}, errList ...error) {
 	w.Write(jsonResp)
 
 }
-
-// set gopath command in terminal

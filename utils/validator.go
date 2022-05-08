@@ -12,7 +12,7 @@ func Validate(doc interface{}) []error {
 	if err != nil {
 		errorList := err.(validator.ValidationErrors)
 		for _, e := range errorList {
-			resp = append(resp, fmt.Errorf(`'%v' is not a valid %v`, e.Value(), e.StructField()))
+			resp = append(resp, fmt.Errorf(`%v is not a valid`, e.StructField()))
 		}
 	}
 	return resp

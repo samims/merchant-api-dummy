@@ -21,6 +21,13 @@ const (
 	ErrorEmptyString             = "ErrorEmptyString"
 	ErrorInvalidCredentials      = "ErrorInvalidCredentials"
 	PermissionDenied             = "PermissionDenied"
+
+	// Validation errors
+	ErorNameIsNotValid     = "Name is not a valid"
+	ErrorEmailNotValid     = "Email is not a valid"
+	ErrorPasswordNotValid  = "PasswordHash is not a valid"
+	ErrorFirstNameNotValid = "FirstName is not a valid"
+	ErrorLastNameNotValid  = "LastName is not a valid"
 )
 
 // ErrorString holds the string version of the error which is sent to the user
@@ -42,6 +49,13 @@ var ErrorString = map[string]string{
 	ErrorEmptyString:             "The string cannot be empty",
 	ErrorInvalidCredentials:      "Invalid credentials",
 	PermissionDenied:             "Permission denied",
+
+	// Validation errors
+	ErorNameIsNotValid:     "Please enter a valid name",
+	ErrorEmailNotValid:     "Please enter a valid email",
+	ErrorPasswordNotValid:  "Please enter a valid password",
+	ErrorFirstNameNotValid: "Please enter a valid first name",
+	ErrorLastNameNotValid:  "Please enter a valid last name",
 }
 
 // error code(response status code) constants
@@ -63,4 +77,11 @@ var ErrorCode = map[string]int{
 	ErrorEmptyString:             http.StatusBadRequest,
 	ErrorInvalidCredentials:      http.StatusUnauthorized,
 	PermissionDenied:             http.StatusForbidden,
+
+	// Validation errors
+	ErorNameIsNotValid:     http.StatusBadRequest,
+	ErrorEmailNotValid:     http.StatusBadRequest,
+	ErrorPasswordNotValid:  http.StatusBadRequest,
+	ErrorFirstNameNotValid: http.StatusBadRequest,
+	ErrorLastNameNotValid:  http.StatusBadRequest,
 }
