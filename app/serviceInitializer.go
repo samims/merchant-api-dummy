@@ -38,7 +38,7 @@ func InitServices(cfg config.Configuration) Services {
 	merchantRepo := repository.NewMerchantRepo(db)
 
 	pingSvc := services.NewPingService()
-	userSvc := services.NewUserService(userRepo)
+	userSvc := services.NewUserService(userRepo, cfg)
 	merchantSvc := services.NewMerchantService(merchantRepo, userRepo)
 
 	return &svc{

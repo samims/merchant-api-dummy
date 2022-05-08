@@ -15,9 +15,11 @@ const (
 	UserNotPartOfAnyMerchant     = "UserNotPartOfAnyMerchant"
 	UserNotPartOfCurrentMerchant = "UserNotPartOfCurrentMerchant"
 	UserIDIsRequired             = "UserIDIsRequired"
+	ErrorUserIDOrEmailRequired   = "ErrorUserIDOrEmailRequired"
 	UserNotFound                 = "UserNotFound"
 	MerchantNotFound             = "MerchantNotFound"
 	ErrorEmptyString             = "ErrorEmptyString"
+	ErrorInvalidCredentials      = "ErrorInvalidCredentials"
 )
 
 // ErrorString holds the string version of the error which is sent to the user
@@ -33,9 +35,11 @@ var ErrorString = map[string]string{
 	UserNotPartOfAnyMerchant:     "User not part of any merchant",
 	UserNotPartOfCurrentMerchant: "User not part of current merchant",
 	UserIDIsRequired:             "User id is required",
+	ErrorUserIDOrEmailRequired:   "User id or email is required",
 	UserNotFound:                 "User not found",
 	MerchantNotFound:             "Merchant not found",
 	ErrorEmptyString:             "The string cannot be empty",
+	ErrorInvalidCredentials:      "Invalid credentials",
 }
 
 // error code(response status code) constants
@@ -51,7 +55,9 @@ var ErrorCode = map[string]int{
 	UserNotPartOfAnyMerchant:     http.StatusBadRequest,
 	UserNotPartOfCurrentMerchant: http.StatusBadRequest,
 	UserIDIsRequired:             http.StatusBadRequest,
+	ErrorUserIDOrEmailRequired:   http.StatusInternalServerError,
 	UserNotFound:                 http.StatusNotFound,
 	MerchantNotFound:             http.StatusNotFound,
 	ErrorEmptyString:             http.StatusBadRequest,
+	ErrorInvalidCredentials:      http.StatusUnauthorized,
 }

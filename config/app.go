@@ -7,6 +7,7 @@ import (
 
 type AppConfig interface {
 	GetBuildEnv() string
+	GetSecretKey() string
 }
 
 // config for app
@@ -18,6 +19,12 @@ type appConfig struct {
 func (config *appConfig) GetBuildEnv() string {
 	config.env.AutomaticEnv()
 	return config.env.GetString("app_build_env")
+}
+
+// GetSecretKey return secret key
+func (config *appConfig) GetSecretKey() string {
+	config.env.AutomaticEnv()
+	return config.env.GetString("secret_key")
 }
 
 // NewAppConfig initializes and return AppConfig

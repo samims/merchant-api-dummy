@@ -30,16 +30,46 @@ type merchantService struct {
 func (svc *merchantService) Create(ctx context.Context, merchant models.Merchant) (models.PublicMerchant, error) {
 	groupError := "Create_merchantService"
 
-	err := merchant.AssignCode()
+	requestUserID := ctx.Value(constants.UserIDContextKey).(int64)
+	userQ := models.User{
+		BaseModel: models.BaseModel{Id: requestUserID},
+	}
+
+	user, err := svc.userRepo.FindOne(ctx, userQ)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
-		return merchant.Serialize(), err
+		return models.PublicMerchant{}, err
+	}
+
+	if user.Merchant != nil {
+		return models.PublicMerchant{}, errors.New(constants.UserAlreadyPartOfAMerchant)
+	}
+
+	err = merchant.AssignCode()
+
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+		return models.PublicMerchant{}, err
 	}
 
 	err = svc.merchantRepo.Save(ctx, &merchant)
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
-		return merchant.Serialize(), err
+		return models.PublicMerchant{}, err
+	}
+
+	user.Merchant = &merchant
+	err = svc.userRepo.Update(ctx, user, []string{"merchant_id"})
+	if err != nil {
+		logger.Log.WithError(err).Error(groupError)
+
+		// rollback merchant creation cause user association failed
+		merchantDeletionErr := svc.merchantRepo.Delete(ctx, merchant)
+		if err != nil {
+			logger.Log.WithError(merchantDeletionErr).Error(groupError)
+			return models.PublicMerchant{}, merchantDeletionErr
+		}
+
 	}
 
 	return merchant.Serialize(), err

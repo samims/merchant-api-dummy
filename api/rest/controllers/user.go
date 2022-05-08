@@ -17,6 +17,7 @@ import (
 
 type User interface {
 	SignUp(http.ResponseWriter, *http.Request)
+	SignIn(http.ResponseWriter, *http.Request)
 	GetAll(http.ResponseWriter, *http.Request)
 	Update(http.ResponseWriter, *http.Request)
 }
@@ -56,6 +57,36 @@ func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	utils.Renderer(w, resp, err)
 
+}
+
+// SignIn controller is a controller that signs in a user by calling the service
+func (ctlr *user) SignIn(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var loginModel models.LoginModel
+	err = json.Unmarshal(body, &loginModel)
+
+	if err != nil {
+		logger.Log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	errorList := utils.Validate(loginModel)
+	if len(errorList) > 0 {
+		logger.Log.Error(errorList)
+		utils.Renderer(w, loginModel, errorList...)
+		return
+	}
+
+	resp, err := ctlr.svc.UserService().SignIn(ctx, loginModel)
+	utils.Renderer(w, resp, err)
 }
 
 func (ctlr *user) GetAll(w http.ResponseWriter, r *http.Request) {

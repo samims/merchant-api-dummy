@@ -72,12 +72,15 @@ func (repo *userRepo) GetAll(ctx context.Context, query models.UserQuery) ([]mod
 // FindOne fetch one object by query
 func (repo *userRepo) FindOne(ctx context.Context, user models.User) (*models.User, error) {
 	groupError := "FindOne_userRepo"
-	if user.Id == 0 {
+	if user.Id == 0 && len(user.Email) == 0 {
 		return nil, errors.New(constants.UserIDIsRequired)
 	}
 	qs := repo.db.QueryTable(new(models.User))
 	if user.Id != 0 {
 		qs = qs.Filter("id", user.Id)
+	}
+	if len(user.Email) > 0 {
+		qs = qs.Filter("email", user.Email)
 	}
 
 	err := qs.One(&user)

@@ -34,6 +34,16 @@ type merchant struct {
 
 func (ctlr *merchant) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+
+	// get UserID from header
+	userID, err := strconv.ParseInt(r.Header.Get("UserID"), 10, 64)
+	if err != nil {
+		logger.Log.Error(err)
+		utils.Renderer(w, nil, errors.New(constants.BadRequest))
+		return
+	}
+	ctx = context.WithValue(ctx, constants.UserIDContextKey, userID)
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Log.Error(err)
