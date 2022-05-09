@@ -1,423 +1,596 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {},
-        "title": "ABc",
-        "version": "1"
-
+      "contact": {},
+      "title": "ABc",
+      "version": "1"
     },
     "paths": {
-        "/signup": {
-            "post": {
-                "description": "SignUp a user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "SignUp a user",
-                "parameters": [
-                    {
-                        "description": "User",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                }
+      "/signup": {
+        "post": {
+          "description": "SignUp a user",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "user"
+          ],
+          "summary": "SignUp a user",
+          "parameters": [
+            {
+              "description": "User",
+              "name": "user",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.User"
+              }
             }
-        },
-        "/login": {
-            "post": {
-                "description": "Login a user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Login a user",
-                "parameters": [
-                    {
-                        "description": "User",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.SignInRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SignInResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorStatusResponse"
-                        }
-                    }
-                }
-
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.User"
+              }
             }
-        },
-        "/users": {
-            "get": {
-                "description": "Get all users",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Get all users",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.UserListResponse"
-                        }
-                    }
-                }
-            }
-
-        },
-        "/users/{id}": {
-            "patch": {
-                "description": "Update a user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update a user",
-                "parameters": [
-                    {
-                        "description": "User",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.PublicUser"
-                        }
-                    },
-                    {
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.PublicUser"
-                        }
-                    }
-                }
-            }
-
-        },
-
-
-        "/merchants": {
-            "post": {
-                "description": "Create a merchant",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "merchant"
-                ],
-                "summary": "Create a merchant",
-                "parameters": [
-                    {
-                        "description": "Merchant",
-                        "name": "merchant",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.MerchantCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.PublicMerchant"
-                        }
-                    }
-                }
-            }
-        },
-        "/merchants/{id}": {
-            "patch": {
-                "description": "Update a merchant",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "merchant"
-                ],
-                "summary": "Update a merchant",
-                "parameters": [
-                    {
-                        "description": "Merchant",
-                        "name": "merchant",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Merchant"
-                        }
-                    },
-                    {
-                        "description": "Merchant ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.PublicMerchant"
-                        }
-                    }
-                }
-            }
+          }
         }
-
-
-
-        
+      },
+      "/login": {
+        "post": {
+          "description": "Login a user",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "user"
+          ],
+          "summary": "Login a user",
+          "parameters": [
+            {
+              "description": "User",
+              "name": "user",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.SignInRequest"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.SignInResponse"
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "schema": {
+                "$ref": "#/definitions/models.ErrorStatusResponse"
+              }
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "description": "Get all users",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "user"
+          ],
+          "summary": "Get all users",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.UserListResponse"
+              }
+            }
+          }
+        }
+      },
+      "/users/{id}": {
+        "patch": {
+          "description": "Update a user",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "user"
+          ],
+          "summary": "Update a user",
+          "parameters": [
+            {
+              "description": "User",
+              "name": "user",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.PublicUser"
+              }
+            },
+            {
+              "description": "User ID",
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.PublicUser"
+              }
+            }
+          }
+        }
+      },
+      "/merchants": {
+        "post": {
+          "description": "Create a merchant",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Create a merchant",
+          "parameters": [
+            {
+              "description": "Merchant",
+              "name": "merchant",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.MerchantCreateRequest"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.PublicMerchant"
+              }
+            }
+          }
+        }
+      },
+      "/merchants/{id}": {
+        "get": {
+          "description": "Get a merchant",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Get a merchant",
+          "parameters": [
+            {
+              "description": "Merchant ID",
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.PublicMerchant"
+              }
+            }
+          }
+        },
+        "patch": {
+          "description": "Update a merchant",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Update a merchant",
+          "parameters": [
+            {
+              "description": "Merchant",
+              "name": "merchant",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.MerchantUpdateRequest"
+              }
+            },
+            {
+              "description": "Merchant ID",
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.PublicMerchant"
+              }
+            }
+          }
+        },
+        "delete": {
+          "description": "Delete a merchant",
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Delete a merchant",
+          "parameters": [
+            {
+              "description": "Merchant ID",
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.SuccessStatusResponse"
+              }
+            }
+          }
+        }
+      },
+      "/merchants/{id}/members": {
+        "get": {
+          "description": "Get all members of a merchant",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Get all members of a merchant",
+          "parameters": [
+            {
+              "description": "Merchant ID",
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.UserListResponse"
+              }
+            }
+          }
+        },
+        "put": {
+          "description": "Add a member to a merchant",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Add a member to a merchant",
+          "parameters": [
+            {
+                "description": "Merchant ID",
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "type": "integer"
+              },
+            {
+              "description": "Member",
+              "name": "user_id",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.AddTeamMemberRequest"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.SuccessStatusResponse"
+              }
+            }
+          }
+        },
+        "delete": {
+          "description": "Remove a member from a merchant",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "tags": [
+            "merchant"
+          ],
+          "summary": "Remove a member from a merchant",
+          "parameters": [
+            {
+                "description": "Merchant ID",
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "type": "integer"
+              },
+            {
+              "description": "Member",
+              "name": "user_id",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/models.AddTeamMemberRequest"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/definitions/models.SuccessStatusResponse"
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "schema": {
+                "$ref": "#/definitions/models.ErrorStatusResponse"
+              }
+            }
+          }
+        }
+      }
     },
     "definitions": {
-        "models.User": {
-            "type": "object",
-            "required": [
-                "email",
-                "first_name",
-                "last_name",
-                "password"
-            ],
-
-            "properties": {
-
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-                
-            }
-        },
-        "models.PublicUser": {
-            "type": "object",
-            "required": [
-                "id",
-                "email",
-                "first_name",
-                "last_name",
-                "merchant_id"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "merchant_id": {
-                    "type": "integer"
-                }
-            }
-        },
-
-        "models.SignInRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-
-        "models.SignInResponse": {
-            "type": "object",
-            "required": [
-                "token",
-                "id",
-                "email",
-                "exp"
-            ],
-            "properties": {
-                "token": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "exp": {
-                    "type": "integer"
-                }
-            }
-        },
-
-        "models.Merchant": {
-            "type": "object",
-            "required": [
-                "name",
-                "url"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                },
-                
-                "code": {
-                    "type": "string"
-                }
-            }
-        },
-
-        "models.TeamMemberResponse": {
-            "type": "object",
-            "properties": {
-                "current_page": {
-                    "type": "integer"
-                },
-                "total_page": {
-                    "type": "integer"
-                },
-                "total_records": {
-                    "type": "integer"
-                },
-                "members": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.PublicUser"
-                    }
-                }
-            }
-        },
-
-        "models.SuccessStatusResponse": {
-            "type": "object",
-            "properties": {
-                "status": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.ErrorStatusResponse": {
-            "type": "object",
-            "properties": {
-                "details": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.UserListResponse": {
+      "models.User": {
+        "type": "object",
+        "required": [
+          "email",
+          "first_name",
+          "last_name",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "models.PublicUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "first_name",
+          "last_name",
+          "merchant_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "merchant_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "models.SignInRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "models.SignInResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "id",
+          "email",
+          "exp"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "exp": {
+            "type": "integer"
+          }
+        }
+      },
+      "models.Merchant": {
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "models.MerchantUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "models.TeamMemberResponse": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer"
+          },
+          "total_page": {
+            "type": "integer"
+          },
+          "total_records": {
+            "type": "integer"
+          },
+          "members": {
             "type": "array",
             "items": {
-                "$ref": "#/definitions/models.PublicUser"
+              "$ref": "#/definitions/models.PublicUser"
             }
-        },
-        "models.MerchantCreateRequest": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.PublicMerchant": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
+          }
         }
+      },
+      "models.SuccessStatusResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean"
+          }
+        }
+      },
+      "models.ErrorStatusResponse": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "models.UserListResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/models.PublicUser"
+        }
+      },
+      "models.MerchantCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "models.PublicMerchant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "models.AddTeamMemberRequest": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          }
+        }
+      }
     }
-}
+  }

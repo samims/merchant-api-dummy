@@ -185,6 +185,7 @@ func (ctrl *merchant) AddTeamMember(w http.ResponseWriter, r *http.Request) {
 		utils.Renderer(w, nil, errors.New(constants.BadRequest))
 		return
 	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Log.Error(err)
