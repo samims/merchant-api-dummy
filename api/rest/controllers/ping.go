@@ -18,6 +18,16 @@ type ping struct {
 	svc app.Services
 }
 
+// Get godoc
+// @Summary Ping
+// @Description Ping the server
+// @Tags ping
+// @Accept json
+// @Produce json
+// @Success 200 {string} string
+// @Failure 500 {string} string
+// @Router /ping [get]
+
 func (p *ping) Get(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(p.svc.PingService().Get()))
 }

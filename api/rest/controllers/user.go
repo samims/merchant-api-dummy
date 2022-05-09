@@ -29,7 +29,15 @@ type user struct {
 	svc app.Services
 }
 
-// SignUp is a controller that creates a new user by calling the service
+// SignUp godoc
+// @Summary SignUp a user
+// @Description SignUp a user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param user body models.User true "User"
+// @Success 200 {object} models.User
+// @Router /user/signup [post]
 func (ctlr *user) SignUp(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	body, err := ioutil.ReadAll(r.Body)

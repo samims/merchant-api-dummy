@@ -1,0 +1,72 @@
+definitions:
+  models.Merchant:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      teams:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+      updated_at:
+        type: string
+      url:
+        type: string
+    required:
+    - name
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      merchant:
+        $ref: '#/definitions/models.Merchant'
+      password:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+info:
+  contact: {}
+paths:
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: SignUp a user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: SignUp a user
+      tags:
+      - user
+swagger: "2.0"
