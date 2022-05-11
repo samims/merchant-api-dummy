@@ -89,11 +89,11 @@ func (svc *merchantService) Create(ctx context.Context, merchant models.Merchant
 
 		// rollback merchant creation cause user association failed
 		merchantDeletionErr := svc.merchantRepo.Delete(ctx, merchant)
-		if err != nil {
+		if merchantDeletionErr != nil {
 			logger.Log.WithError(merchantDeletionErr).Error(groupError)
 			return models.PublicMerchant{}, merchantDeletionErr
 		}
-
+		return models.PublicMerchant{}, err
 	}
 
 	return merchant.Serialize(), err
