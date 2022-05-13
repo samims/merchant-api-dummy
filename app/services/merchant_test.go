@@ -445,6 +445,107 @@ func (suite *MerchantServiceTestSuite) TestMerchantServiceUpdateSuccess() {
 	suite.mockMerchantRepo.AssertExpectations(suite.T())
 }
 
+// TestMerchantServiceDeleteRaisesIfUserDoNotHavePermission tests if user do not have permission to delete merchant
+// then it should return error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceDeleteRaisesIfUserDoNotHavePermission() {
+	// Arrange
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+
+	// Act
+	resp, err := suite.SUT.Delete(ctx, merchant.Id+1)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(constants.PermissionDenied, err.Error())
+	suite.Equal(map[string]interface{}{"success": false}, resp)
+
+	suite.userRepoMock.AssertExpectations(suite.T())
+
+}
+
+// TestMerchantServiceDeleteRaisesIfDelete fails then it should return error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceDeleteRaisesIfDeleteFails() {
+	// Arrange
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+	suite.mockMerchantRepo.On("FindOne", ctx, mock.Anything).Return(&merchant, nil)
+	suite.mockMerchantRepo.On("Delete", ctx, mock.Anything).Return(orm.ErrStmtClosed)
+
+	// Act
+	resp, err := suite.SUT.Delete(ctx, merchant.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(orm.ErrStmtClosed.Error(), err.Error())
+	suite.Equal(map[string]interface{}{"success": false}, resp)
+
+	suite.userRepoMock.AssertExpectations(suite.T())
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+}
+
+// TestMerchantServiceDeleteSuccess tests if merchant is found then it should return success no error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceDeleteSuccess() {
+	// Arrange
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+	suite.mockMerchantRepo.On("FindOne", ctx, mock.Anything).Return(&merchant, nil)
+	suite.mockMerchantRepo.On("Delete", ctx, mock.Anything).Return(nil)
+
+	// Act
+	resp, err := suite.SUT.Delete(ctx, merchant.Id)
+
+	// Assert
+	suite.NoError(err)
+	suite.Equal(map[string]interface{}{"success": true}, resp)
+
+	suite.userRepoMock.AssertExpectations(suite.T())
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+}
+
 func TestMerchantService(t *testing.T) {
 	suite.Run(t, new(MerchantServiceTestSuite))
 }
