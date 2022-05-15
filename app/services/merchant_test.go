@@ -546,6 +546,108 @@ func (suite *MerchantServiceTestSuite) TestMerchantServiceDeleteSuccess() {
 	suite.mockMerchantRepo.AssertExpectations(suite.T())
 }
 
+// TestMerchantServiceRaisesPaginationError tests if non positive page number provided it sould return error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceRaisesPaginationError() {
+	// Arrange
+	page := int64(-1)
+	pageSize := int64(10)
+	// Act
+	_, err := suite.SUT.GetTeamMembers(suite.ctx, 1, &page, &pageSize)
+	// Assert
+	suite.Error(err)
+	suite.Equal(constants.PaginationError, err.Error())
+
+}
+
+// TestMerchantServiceGetTeamMembersRaisesIfMerchantNotFound tests if merchant is not found then it should return error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceGetTeamMembersRaisesIfMerchantNotFound() {
+	// Arrange
+	page := int64(1)
+	pageSize := int64(10)
+
+	// Mock
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(nil, orm.ErrNoRows)
+	// Act
+	_, err := suite.SUT.GetTeamMembers(suite.ctx, 1, &page, &pageSize)
+	// Assert
+	suite.Error(err)
+	suite.Equal(orm.ErrNoRows.Error(), err.Error())
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+}
+
+// TestMerchantServiceGetTeamMembersRaisesIfRelatedMerchantFetchFail tests if related merchant fetch fails then it should return error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceGetTeamMembersRaisesIfReltedUserFetchFail() {
+	// Arrange
+	page := int64(1)
+	pageSize := int64(10)
+
+	// Mock
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&models.Merchant{}, nil)
+	suite.userRepoMock.On("GetAll", mock.Anything, mock.Anything).Return([]models.User{}, int64(0), orm.ErrNoRows)
+
+	// Act
+	res, err := suite.SUT.GetTeamMembers(suite.ctx, 1, &page, &pageSize)
+	// Assert
+	suite.Error(err)
+
+	suite.Equal(reflect.TypeOf(models.TeamMemberResponse{}), reflect.TypeOf(res))
+	suite.Equal(res.Members, []models.PublicUser{})
+	suite.Equal(orm.ErrNoRows.Error(), err.Error())
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+
+}
+
+// TestMerchantServiceGetTeamMembersSuccess tests if merchant is found then it should return success no error
+func (suite *MerchantServiceTestSuite) TestMerchantServiceGetTeamMembersSuccess() {
+	// Arrange
+	page := int64(1)
+	pageSize := int64(10)
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+
+	user1 := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+	user2 := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(2),
+		},
+		Merchant: &merchant,
+	}
+
+	users := []models.User{user1, user2}
+
+	// Mock
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&models.Merchant{}, nil)
+	suite.userRepoMock.On("GetAll", mock.Anything, mock.Anything).Return(users, int64(0), nil)
+
+	// Act
+	res, err := suite.SUT.GetTeamMembers(suite.ctx, 1, &page, &pageSize)
+
+	// Assert
+	suite.NoError(err)
+	suite.Equal(reflect.TypeOf(models.TeamMemberResponse{}), reflect.TypeOf(res))
+	suite.Greaterf(len(res.Members), 0, "should have at least one member")
+
+	suite.NotEmpty(res.Members)
+
+	// check for pagination
+	suite.NotEqual(res.CurrentPage, 0)
+	suite.NotEqual(res.TotalRecord, 0)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
 func TestMerchantService(t *testing.T) {
 	suite.Run(t, new(MerchantServiceTestSuite))
 }

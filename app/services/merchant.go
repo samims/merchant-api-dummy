@@ -206,6 +206,7 @@ func (svc *merchantService) GetTeamMembers(ctx context.Context, id int64, page, 
 	}
 
 	relatedUsers, totalRecords, err := svc.userRepo.GetAll(ctx, userQuery)
+
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
 		return res, err
