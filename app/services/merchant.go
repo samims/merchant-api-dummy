@@ -251,6 +251,7 @@ func (svc *merchantService) AddTeamMember(ctx context.Context, merchantId int64,
 		BaseModel: models.BaseModel{Id: userId},
 	}
 	user, err := svc.userRepo.FindOne(ctx, userQ)
+
 	if err != nil {
 		logger.Log.WithError(err).Error(groupError)
 		return res, err

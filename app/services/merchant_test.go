@@ -648,6 +648,224 @@ func (suite *MerchantServiceTestSuite) TestMerchantServiceGetTeamMembersSuccess(
 	suite.userRepoMock.AssertExpectations(suite.T())
 }
 
+// TestAddTeamMemberRaisesForPermissionDenied tests if user fetch for authenticated user id fails then it should return error
+func (suite *MerchantServiceTestSuite) TestAddTeamMemberRaisesIfAuthenticatedUserFetchOnVerifyPermissionFails() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&models.User{}, orm.ErrNoRows)
+
+	// Act
+	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id, user.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(orm.ErrNoRows.Error(), err.Error())
+	suite.Equal(res["success"], false)
+
+	suite.userRepoMock.AssertExpectations(suite.T())
+
+}
+
+// TestAddTeamMemberRaisesForPermissionDenied tests if user is not a merchant member then it should return error
+func (suite *MerchantServiceTestSuite) TestAddTeamMemberRaisesForObjectLevelPermissionError() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+
+	// Act
+	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id+1, user.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(err.Error(), constants.PermissionDenied)
+	suite.Equal(res["success"], false)
+
+	suite.userRepoMock.AssertExpectations(suite.T())
+
+}
+
+// TestAddTeamMemberRaisesIfMerchantFetchFails tests if merchant fetch fails then it should return error
+func (suite *MerchantServiceTestSuite) TestAddTeamMemberRaisesIfMerchantFetchFails() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&models.Merchant{}, orm.ErrNoRows)
+
+	// Act
+	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id, user.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(orm.ErrNoRows.Error(), err.Error())
+	suite.Equal(res["success"], false)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
+// TestAddTeamMemberRaisesIfUserAlreadyPartOfMerchant tests if user already part of a merchant then it should return error
+func (suite *MerchantServiceTestSuite) TestAddTeamMemberRaisesIfUserAlreadyPartOfMerchant() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&merchant, nil)
+
+	// Act
+	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id, user.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(constants.UserAlreadyPartOfAMerchant, err.Error())
+	suite.Equal(res["success"], false)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
+// TestAddTeamMemberRaisesIfUserUpdateFails tests if user update fails when adding merchant to the new member(user)
+func (suite *MerchantServiceTestSuite) TestAddTeamMemberRaisesIfUserUpdateFails() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	newMemberUser := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(2),
+		},
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil).Once()
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&merchant, nil)
+	suite.userRepoMock.On("FindOne", mock.Anything, mock.Anything).Return(&newMemberUser, nil).Once()
+	suite.userRepoMock.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(orm.ErrNoRows)
+
+	// Act
+	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id, newMemberUser.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(orm.ErrNoRows.Error(), err.Error())
+	suite.Equal(res["success"], false)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
+// test success scenario
+// TestAddTeamMemberSuccess tests if user is added to merchant team successfully then it should return success
+func (suite *MerchantServiceTestSuite) TestAddTeamMemberSuccess() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	newMemberUser := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(2),
+		},
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil).Once()
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&merchant, nil)
+	suite.userRepoMock.On("FindOne", mock.Anything, mock.Anything).Return(&newMemberUser, nil).Once()
+	suite.userRepoMock.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+	// Act
+	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id, newMemberUser.Id)
+
+	// Assert
+	suite.NoError(err)
+	suite.Equal(res["success"], true)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
 func TestMerchantService(t *testing.T) {
 	suite.Run(t, new(MerchantServiceTestSuite))
 }
