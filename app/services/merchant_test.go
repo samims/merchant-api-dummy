@@ -824,7 +824,6 @@ func (suite *MerchantServiceTestSuite) TestAddTeamMemberRaisesIfUserUpdateFails(
 	suite.userRepoMock.AssertExpectations(suite.T())
 }
 
-// test success scenario
 // TestAddTeamMemberSuccess tests if user is added to merchant team successfully then it should return success
 func (suite *MerchantServiceTestSuite) TestAddTeamMemberSuccess() {
 	// Arrange
@@ -857,6 +856,158 @@ func (suite *MerchantServiceTestSuite) TestAddTeamMemberSuccess() {
 
 	// Act
 	res, err := suite.SUT.AddTeamMember(ctx, merchant.Id, newMemberUser.Id)
+
+	// Assert
+	suite.NoError(err)
+	suite.Equal(res["success"], true)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
+// TestRemoveTeamMemberRaisesIfUserDoesNotExist tests if user does not exist then it should return error
+func (suite *MerchantServiceTestSuite) TestRemoveTeamMemberRaisesIfUserDoesNotExist() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(nil, orm.ErrNoRows)
+
+	// Act
+	res, err := suite.SUT.RemoveTeamMember(ctx, merchant.Id, user.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(err.Error(), orm.ErrNoRows.Error())
+	suite.Equal(res["success"], false)
+
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
+// TestRemoveTeamMemberRaisesIfUserDoNotHavePermission tests if user does not have permission then it should return error
+func (suite *MerchantServiceTestSuite) TestRemoveTeamMemberRaisesIfUserDoNotHavePermission() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+	newMemberUser := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(2),
+		},
+	}
+
+	invalidMerchantId := merchant.Id + 1
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+
+	// Act
+	res, err := suite.SUT.RemoveTeamMember(ctx, invalidMerchantId, newMemberUser.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(err.Error(), constants.PermissionDenied)
+	suite.Equal(res["success"], false)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+}
+
+// TestRemoveTeamMemberRaisesIfUserUpdatedFailed tests if user update failed then it should return error
+func (suite *MerchantServiceTestSuite) TestRemoveTeamMemberRaisesIfUserUpdatedFailed() {
+	// Arrange
+
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+
+	newMemberUser := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(2),
+		},
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&merchant, nil)
+	suite.userRepoMock.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(orm.ErrArgs)
+
+	// Act
+	res, err := suite.SUT.RemoveTeamMember(ctx, merchant.Id, newMemberUser.Id)
+
+	// Assert
+	suite.Error(err)
+	suite.Equal(err.Error(), orm.ErrArgs.Error())
+	suite.Equal(res["success"], false)
+
+	suite.mockMerchantRepo.AssertExpectations(suite.T())
+	suite.userRepoMock.AssertExpectations(suite.T())
+
+}
+
+// TestRemoveTeamMemberSuccess tests if user update success then it should return success
+func (suite *MerchantServiceTestSuite) TestRemoveTeamMemberSuccess() {
+	// Arrange
+	merchant := models.Merchant{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+	}
+	user := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(1),
+		},
+		Merchant: &merchant,
+	}
+	newMemberUser := models.User{
+		BaseModel: models.BaseModel{
+			Id: int64(2),
+		},
+	}
+
+	ctx := context.WithValue(suite.ctx, constants.UserIDContextKey, user.Id)
+
+	// Mock
+	suite.userRepoMock.On("FindOne", ctx, mock.Anything).Return(&user, nil)
+	suite.mockMerchantRepo.On("FindOne", mock.Anything, mock.Anything).Return(&merchant, nil)
+	suite.userRepoMock.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+	// Act
+	res, err := suite.SUT.RemoveTeamMember(ctx, merchant.Id, newMemberUser.Id)
 
 	// Assert
 	suite.NoError(err)
